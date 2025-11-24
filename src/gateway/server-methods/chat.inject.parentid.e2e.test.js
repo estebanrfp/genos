@@ -1,0 +1,60 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { CURRENT_SESSION_VERSION } from "@mariozechner/pi-coding-agent";
+import { describe, expect, it, vi } from "vitest";
+describe("gateway chat.inject transcript writes", () => {
+  it("appends a Pi session entry that includes parentId", async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "genosos-chat-inject-"));
+    const transcriptPath = path.join(dir, "sess.jsonl");
+    fs.writeFileSync(
+      transcriptPath,
+      `${JSON.stringify({
+        type: "session",
+        version: CURRENT_SESSION_VERSION,
+        id: "sess-1",
+        timestamp: new Date(0).toISOString(),
+        cwd: "/tmp",
+      })}\n`,
+      "utf-8",
+    );
+    vi.doMock("../session-utils.js", async (importOriginal) => {
+      const original = await importOriginal();
+      return {
+        ...original,
+        loadSessionEntry: () => ({
+          storePath: path.join(dir, "sessions.json"),
+          entry: {
+            sessionId: "sess-1",
+            sessionFile: transcriptPath,
+          },
+        }),
+      };
+    });
+    const { chatHandlers } = await import("./chat.js");
+    const respond = vi.fn();
+    const context = {
+      broadcast: vi.fn(),
+      nodeSendToSession: vi.fn(),
+    };
+    await chatHandlers["chat.inject"]({
+      params: { sessionKey: "k1", message: "hello" },
+      respond,
+      req: {},
+      client: null,
+      isWebchatConnect: () => false,
+      context,
+    });
+    expect(respond).toHaveBeenCalled();
+    const [, payload, error] = respond.mock.calls.at(-1) ?? [];
+    expect(error).toBeUndefined();
+    expect(payload).toMatchObject({ ok: true });
+    const lines = fs.readFileSync(transcriptPath, "utf-8").split(/\r?\n/).filter(Boolean);
+    expect(lines.length).toBeGreaterThanOrEqual(2);
+    const last = JSON.parse(lines.at(-1));
+    expect(last.type).toBe("message");
+    expect(Object.prototype.hasOwnProperty.call(last, "parentId")).toBe(true);
+    expect(last).toHaveProperty("id");
+    expect(last).toHaveProperty("message");
+  });
+});

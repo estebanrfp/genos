@@ -1,0 +1,14 @@
+{
+  "name": "@genosos/discord",
+  "version": "2026.2.18",
+  "description": "GenosOS Discord channel plugin",
+  "type": "module",
+  "devDependencies": {
+    "genosos": "workspace:*"
+  },
+  "genosos": {
+    "extensions": [
+      "./index.js"
+    ]
+  }
+}

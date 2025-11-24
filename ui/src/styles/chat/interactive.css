@@ -1,0 +1,276 @@
+/* GenosOS — Interactive chat components (ix-* prefix) */
+
+.ix-component {
+  margin: 8px 0;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.ix-title {
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+/* ── Status Grid ──────────────────────────────────────────────────────────── */
+
+.ix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.ix-card {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ix-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.ix-card__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ix-card__status {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* ── Semaphore Dots ───────────────────────────────────────────────────────── */
+
+.ix-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.ix-dot--green  { background: var(--ok); }
+.ix-dot--yellow { background: var(--warn); }
+.ix-dot--red    { background: var(--danger); }
+.ix-dot--gray   { background: var(--muted); }
+
+/* ── Action Buttons ───────────────────────────────────────────────────────── */
+
+.ix-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.ix-btn {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ix-btn:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+}
+
+.ix-btn:active {
+  background: var(--bg-muted);
+}
+
+/* ── Stat Bars ────────────────────────────────────────────────────────────── */
+
+.ix-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ix-bar__label {
+  min-width: 80px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.ix-bar__track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.ix-bar__fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.ix-bar__detail {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 50px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Width classes: 0–100 in steps of 5 */
+.ix-bar-w-0   { width: 0%; }
+.ix-bar-w-5   { width: 5%; }
+.ix-bar-w-10  { width: 10%; }
+.ix-bar-w-15  { width: 15%; }
+.ix-bar-w-20  { width: 20%; }
+.ix-bar-w-25  { width: 25%; }
+.ix-bar-w-30  { width: 30%; }
+.ix-bar-w-35  { width: 35%; }
+.ix-bar-w-40  { width: 40%; }
+.ix-bar-w-45  { width: 45%; }
+.ix-bar-w-50  { width: 50%; }
+.ix-bar-w-55  { width: 55%; }
+.ix-bar-w-60  { width: 60%; }
+.ix-bar-w-65  { width: 65%; }
+.ix-bar-w-70  { width: 70%; }
+.ix-bar-w-75  { width: 75%; }
+.ix-bar-w-80  { width: 80%; }
+.ix-bar-w-85  { width: 85%; }
+.ix-bar-w-90  { width: 90%; }
+.ix-bar-w-95  { width: 95%; }
+.ix-bar-w-100 { width: 100%; }
+
+/* ── Data Table ───────────────────────────────────────────────────────────── */
+
+.ix-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #00000005;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ix-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ix-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.ix-table tbody tr:nth-child(even) {
+  background: var(--bg-accent);
+}
+
+.ix-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.ix-table .ix-dot {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Numeric columns — right-aligned with monospace */
+.ix-table .ix-num {
+  text-align: right;
+}
+
+/* Highlight max/min values */
+.ix-table .ix-val-max {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.ix-table .ix-val-min {
+  color: var(--muted);
+}
+
+/* ── Key-Value ────────────────────────────────────────────────────────────── */
+
+.ix-kv {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 0.78rem;
+}
+
+.ix-kv__key {
+  color: var(--muted);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.ix-kv__value {
+  color: var(--text);
+}
+
+/* ── Charts (Frappe Charts) ──────────────────────────────────────────────── */
+
+.ix-component--chart {
+  width: 100%;
+}
+
+.chart-container {
+  background: #00000005;
+}
+
+.ix-chart {
+  min-height: 100px;
+}
+
+.ix-chart .frappe-chart .chart-legend {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+.ix-chart .frappe-chart .title,
+.ix-chart .frappe-chart .sub-title {
+  display: none;
+}
+
+.ix-chart .frappe-chart .axis text,
+.ix-chart .frappe-chart .chart-label {
+  fill: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+.ix-chart .frappe-chart .axis line,
+.ix-chart .frappe-chart .axis .domain {
+  stroke: var(--border);
+}
+
+.ix-chart .graph-svg-tip {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}

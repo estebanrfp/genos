@@ -1,0 +1,252 @@
+import { Type } from "@sinclair/typebox";
+import { NonEmptyString } from "./primitives.js";
+export const ModelChoiceSchema = Type.Object(
+  {
+    id: NonEmptyString,
+    name: NonEmptyString,
+    provider: NonEmptyString,
+    contextWindow: Type.Optional(Type.Integer({ minimum: 1 })),
+    reasoning: Type.Optional(Type.Boolean()),
+  },
+  { additionalProperties: false },
+);
+export const AgentSummarySchema = Type.Object(
+  {
+    id: NonEmptyString,
+    name: Type.Optional(NonEmptyString),
+    identity: Type.Optional(
+      Type.Object(
+        {
+          name: Type.Optional(NonEmptyString),
+          theme: Type.Optional(NonEmptyString),
+          emoji: Type.Optional(NonEmptyString),
+          avatar: Type.Optional(NonEmptyString),
+          avatarUrl: Type.Optional(NonEmptyString),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+  },
+  { additionalProperties: false },
+);
+export const AgentsListParamsSchema = Type.Object({}, { additionalProperties: false });
+export const AgentsListResultSchema = Type.Object(
+  {
+    defaultId: NonEmptyString,
+    mainKey: NonEmptyString,
+    scope: Type.Union([Type.Literal("per-sender"), Type.Literal("global")]),
+    agents: Type.Array(AgentSummarySchema),
+  },
+  { additionalProperties: false },
+);
+export const AgentsCreateParamsSchema = Type.Object(
+  {
+    name: NonEmptyString,
+    workspace: Type.Optional(NonEmptyString),
+    emoji: Type.Optional(Type.String()),
+    description: Type.Optional(Type.String()),
+    avatar: Type.Optional(Type.String()),
+    template: Type.Optional(Type.String()),
+    toolProfile: Type.Optional(
+      Type.Union([
+        Type.Literal("coding"),
+        Type.Literal("messaging"),
+        Type.Literal("minimal"),
+        Type.Literal("full"),
+      ]),
+    ),
+  },
+  { additionalProperties: false },
+);
+export const AgentsCreateResultSchema = Type.Object(
+  {
+    ok: Type.Literal(true),
+    agentId: NonEmptyString,
+    name: NonEmptyString,
+    workspace: NonEmptyString,
+    sessionKey: NonEmptyString,
+    template: Type.Optional(Type.String()),
+    toolProfile: Type.Optional(Type.String()),
+    autoConfig: Type.Optional(Type.Array(Type.String())),
+    hint: Type.Optional(Type.String()),
+  },
+  { additionalProperties: false },
+);
+export const AgentsUpdateParamsSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+    name: Type.Optional(NonEmptyString),
+    workspace: Type.Optional(NonEmptyString),
+    model: Type.Optional(NonEmptyString),
+    avatar: Type.Optional(Type.String()),
+  },
+  { additionalProperties: false },
+);
+export const AgentsUpdateResultSchema = Type.Object(
+  {
+    ok: Type.Literal(true),
+    agentId: NonEmptyString,
+  },
+  { additionalProperties: false },
+);
+export const AgentsDeleteParamsSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+    deleteFiles: Type.Optional(Type.Boolean()),
+  },
+  { additionalProperties: false },
+);
+export const AgentsDeleteResultSchema = Type.Object(
+  {
+    ok: Type.Literal(true),
+    agentId: NonEmptyString,
+    removedBindings: Type.Integer({ minimum: 0 }),
+  },
+  { additionalProperties: false },
+);
+export const AgentsRenameParamsSchema = Type.Object(
+  { agentId: NonEmptyString, newId: NonEmptyString },
+  { additionalProperties: false },
+);
+export const AgentsRenameResultSchema = Type.Object(
+  {
+    ok: Type.Literal(true),
+    oldId: NonEmptyString,
+    newId: NonEmptyString,
+    migratedSessions: Type.Integer({ minimum: 0 }),
+    workspaceMoved: Type.Boolean(),
+  },
+  { additionalProperties: false },
+);
+export const AgentsFileEntrySchema = Type.Object(
+  {
+    name: NonEmptyString,
+    path: NonEmptyString,
+    missing: Type.Boolean(),
+    size: Type.Optional(Type.Integer({ minimum: 0 })),
+    updatedAtMs: Type.Optional(Type.Integer({ minimum: 0 })),
+    content: Type.Optional(Type.String()),
+    section: Type.Optional(
+      Type.Union([Type.Literal("core"), Type.Literal("memory"), Type.Literal("docs")]),
+    ),
+    editable: Type.Optional(Type.Boolean()),
+    contentType: Type.Optional(
+      Type.Union([Type.Literal("text"), Type.Literal("image"), Type.Literal("binary")]),
+    ),
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesListParamsSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesListResultSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+    workspace: NonEmptyString,
+    files: Type.Array(AgentsFileEntrySchema),
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesGetParamsSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+    name: NonEmptyString,
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesGetResultSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+    workspace: NonEmptyString,
+    file: AgentsFileEntrySchema,
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesSetParamsSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+    name: NonEmptyString,
+    content: Type.String(),
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesSetResultSchema = Type.Object(
+  {
+    ok: Type.Literal(true),
+    agentId: NonEmptyString,
+    workspace: NonEmptyString,
+    file: AgentsFileEntrySchema,
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesEditParamsSchema = Type.Object(
+  {
+    agentId: NonEmptyString,
+    name: NonEmptyString,
+    oldText: Type.String({ minLength: 1 }),
+    newText: Type.String(),
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesEditResultSchema = Type.Object(
+  {
+    ok: Type.Literal(true),
+    agentId: NonEmptyString,
+    workspace: NonEmptyString,
+    file: AgentsFileEntrySchema,
+  },
+  { additionalProperties: false },
+);
+export const AgentsFilesDeleteParamsSchema = Type.Object(
+  { agentId: NonEmptyString, name: NonEmptyString },
+  { additionalProperties: false },
+);
+export const AgentsFilesDeleteResultSchema = Type.Object(
+  { ok: Type.Literal(true), agentId: NonEmptyString, name: NonEmptyString },
+  { additionalProperties: false },
+);
+export const ModelsListParamsSchema = Type.Object(
+  {
+    onlyAvailable: Type.Optional(Type.Boolean()),
+  },
+  { additionalProperties: false },
+);
+export const ModelsListResultSchema = Type.Object(
+  {
+    models: Type.Array(ModelChoiceSchema),
+  },
+  { additionalProperties: false },
+);
+export const SkillsStatusParamsSchema = Type.Object(
+  {
+    agentId: Type.Optional(NonEmptyString),
+  },
+  { additionalProperties: false },
+);
+export const SkillsBinsParamsSchema = Type.Object({}, { additionalProperties: false });
+export const SkillsBinsResultSchema = Type.Object(
+  {
+    bins: Type.Array(NonEmptyString),
+  },
+  { additionalProperties: false },
+);
+export const SkillsInstallParamsSchema = Type.Object(
+  {
+    name: NonEmptyString,
+    installId: NonEmptyString,
+    timeoutMs: Type.Optional(Type.Integer({ minimum: 1000 })),
+  },
+  { additionalProperties: false },
+);
+export const SkillsUpdateParamsSchema = Type.Object(
+  {
+    skillKey: NonEmptyString,
+    enabled: Type.Optional(Type.Boolean()),
+    apiKey: Type.Optional(Type.String()),
+    env: Type.Optional(Type.Record(NonEmptyString, Type.String())),
+  },
+  { additionalProperties: false },
+);

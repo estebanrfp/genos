@@ -1,0 +1,216 @@
+let resolveDefaultGitDir = function () {
+  return resolveStateDir(process.env, os.homedir);
+};
+import { spawnSync } from "node:child_process";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { resolveStateDir } from "../../config/paths.js";
+import { resolveGenosOSPackageRoot } from "../../infra/genosos-root.js";
+import { readPackageName, readPackageVersion } from "../../infra/package-json.js";
+import { trimLogTail } from "../../infra/restart-sentinel.js";
+import { parseSemver } from "../../infra/runtime-guard.js";
+import { fetchNpmTagVersion } from "../../infra/update-check.js";
+import {
+  detectGlobalInstallManagerByPresence,
+  detectGlobalInstallManagerForRoot,
+} from "../../infra/update-global.js";
+import { runCommandWithTimeout } from "../../process/exec.js";
+import { defaultRuntime } from "../../runtime.js";
+import { theme } from "../../terminal/theme.js";
+import { pathExists } from "../../utils.js";
+const INVALID_TIMEOUT_ERROR = "--timeout must be a positive integer (seconds)";
+export function parseTimeoutMsOrExit(timeout) {
+  const timeoutMs = timeout ? Number.parseInt(timeout, 10) * 1000 : undefined;
+  if (timeoutMs !== undefined && (Number.isNaN(timeoutMs) || timeoutMs <= 0)) {
+    defaultRuntime.error(INVALID_TIMEOUT_ERROR);
+    defaultRuntime.exit(1);
+    return null;
+  }
+  return timeoutMs;
+}
+const GENOS_REPO_URL = "https://github.com/genosos/genosos.git";
+const MAX_LOG_CHARS = 8000;
+export const DEFAULT_PACKAGE_NAME = "genosos";
+const CORE_PACKAGE_NAMES = new Set([DEFAULT_PACKAGE_NAME]);
+export function normalizeTag(value) {
+  if (!value) {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+  if (trimmed.startsWith("genosos@")) {
+    return trimmed.slice("genosos@".length);
+  }
+  if (trimmed.startsWith(`${DEFAULT_PACKAGE_NAME}@`)) {
+    return trimmed.slice(`${DEFAULT_PACKAGE_NAME}@`.length);
+  }
+  return trimmed;
+}
+export function normalizeVersionTag(tag) {
+  const trimmed = tag.trim();
+  if (!trimmed) {
+    return null;
+  }
+  const cleaned = trimmed.startsWith("v") ? trimmed.slice(1) : trimmed;
+  return parseSemver(cleaned) ? cleaned : null;
+}
+
+export { readPackageName, readPackageVersion };
+export async function resolveTargetVersion(tag, timeoutMs) {
+  const direct = normalizeVersionTag(tag);
+  if (direct) {
+    return direct;
+  }
+  const res = await fetchNpmTagVersion({ tag, timeoutMs });
+  return res.version ?? null;
+}
+export async function isGitCheckout(root) {
+  try {
+    await fs.stat(path.join(root, ".git"));
+    return true;
+  } catch {
+    return false;
+  }
+}
+export async function isCorePackage(root) {
+  const name = await readPackageName(root);
+  return Boolean(name && CORE_PACKAGE_NAMES.has(name));
+}
+export async function isEmptyDir(targetPath) {
+  try {
+    const entries = await fs.readdir(targetPath);
+    return entries.length === 0;
+  } catch {
+    return false;
+  }
+}
+export function resolveGitInstallDir() {
+  const override = process.env.GENOS_GIT_DIR?.trim();
+  if (override) {
+    return path.resolve(override);
+  }
+  return resolveDefaultGitDir();
+}
+export function resolveNodeRunner() {
+  const base = path.basename(process.execPath).toLowerCase();
+  if (base === "node" || base === "node.exe") {
+    return process.execPath;
+  }
+  return "node";
+}
+export async function resolveUpdateRoot() {
+  return (
+    (await resolveGenosOSPackageRoot({
+      moduleUrl: import.meta.url,
+      argv1: process.argv[1],
+      cwd: process.cwd(),
+    })) ?? process.cwd()
+  );
+}
+export async function runUpdateStep(params) {
+  const command = params.argv.join(" ");
+  params.progress?.onStepStart?.({
+    name: params.name,
+    command,
+    index: 0,
+    total: 0,
+  });
+  const started = Date.now();
+  const res = await runCommandWithTimeout(params.argv, {
+    cwd: params.cwd,
+    timeoutMs: params.timeoutMs,
+  });
+  const durationMs = Date.now() - started;
+  const stderrTail = trimLogTail(res.stderr, MAX_LOG_CHARS);
+  params.progress?.onStepComplete?.({
+    name: params.name,
+    command,
+    index: 0,
+    total: 0,
+    durationMs,
+    exitCode: res.code,
+    stderrTail,
+  });
+  return {
+    name: params.name,
+    command,
+    cwd: params.cwd ?? process.cwd(),
+    durationMs,
+    exitCode: res.code,
+    stdoutTail: trimLogTail(res.stdout, MAX_LOG_CHARS),
+    stderrTail,
+  };
+}
+export async function ensureGitCheckout(params) {
+  const dirExists = await pathExists(params.dir);
+  if (!dirExists) {
+    return await runUpdateStep({
+      name: "git clone",
+      argv: ["git", "clone", GENOS_REPO_URL, params.dir],
+      timeoutMs: params.timeoutMs,
+      progress: params.progress,
+    });
+  }
+  if (!(await isGitCheckout(params.dir))) {
+    const empty = await isEmptyDir(params.dir);
+    if (!empty) {
+      throw new Error(
+        `GENOS_GIT_DIR points at a non-git directory: ${params.dir}. Set GENOS_GIT_DIR to an empty folder or an genosos checkout.`,
+      );
+    }
+    return await runUpdateStep({
+      name: "git clone",
+      argv: ["git", "clone", GENOS_REPO_URL, params.dir],
+      cwd: params.dir,
+      timeoutMs: params.timeoutMs,
+      progress: params.progress,
+    });
+  }
+  if (!(await isCorePackage(params.dir))) {
+    throw new Error(`GENOS_GIT_DIR does not look like a core checkout: ${params.dir}.`);
+  }
+  return null;
+}
+export async function resolveGlobalManager(params) {
+  const runCommand = async (argv, options) => {
+    const res = await runCommandWithTimeout(argv, options);
+    return { stdout: res.stdout, stderr: res.stderr, code: res.code };
+  };
+  if (params.installKind === "package") {
+    const detected = await detectGlobalInstallManagerForRoot(
+      runCommand,
+      params.root,
+      params.timeoutMs,
+    );
+    if (detected) {
+      return detected;
+    }
+  }
+  const byPresence = await detectGlobalInstallManagerByPresence(runCommand, params.timeoutMs);
+  return byPresence ?? "npm";
+}
+export async function tryWriteCompletionCache(root, jsonMode) {
+  const binPath = path.join(root, "genosos.mjs");
+  if (!(await pathExists(binPath))) {
+    return;
+  }
+  const result = spawnSync(resolveNodeRunner(), [binPath, "completion", "--write-state"], {
+    cwd: root,
+    env: process.env,
+    encoding: "utf-8",
+  });
+  if (result.error) {
+    if (!jsonMode) {
+      defaultRuntime.log(theme.warn(`Completion cache update failed: ${String(result.error)}`));
+    }
+    return;
+  }
+  if (result.status !== 0 && !jsonMode) {
+    const stderr = (result.stderr ?? "").toString().trim();
+    const detail = stderr ? ` (${stderr})` : "";
+    defaultRuntime.log(theme.warn(`Completion cache update failed${detail}.`));
+  }
+}

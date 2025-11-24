@@ -1,0 +1,1 @@
+export const DEFAULT_IMESSAGE_PROBE_TIMEOUT_MS = 1e4;

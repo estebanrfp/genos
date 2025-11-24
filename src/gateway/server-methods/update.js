@@ -1,0 +1,107 @@
+import { loadConfig } from "../../config/config.js";
+import { extractDeliveryInfo } from "../../config/sessions.js";
+import { resolveGenosOSPackageRoot } from "../../infra/genosos-root.js";
+import {
+  formatDoctorNonInteractiveHint,
+  writeRestartSentinel,
+} from "../../infra/restart-sentinel.js";
+import { scheduleGatewaySigusr1Restart } from "../../infra/restart.js";
+import { normalizeUpdateChannel } from "../../infra/update-channels.js";
+import { runGatewayUpdate } from "../../infra/update-runner.js";
+import { validateUpdateRunParams } from "../protocol/index.js";
+import { parseRestartRequestParams } from "./restart-request.js";
+import { assertValidParams } from "./validation.js";
+export const updateHandlers = {
+  "update.run": async ({ params, respond }) => {
+    if (!assertValidParams(params, validateUpdateRunParams, "update.run", respond)) {
+      return;
+    }
+    const { sessionKey, note, restartDelayMs } = parseRestartRequestParams(params);
+    const { deliveryContext, threadId } = extractDeliveryInfo(sessionKey);
+    const timeoutMsRaw = params.timeoutMs;
+    const timeoutMs =
+      typeof timeoutMsRaw === "number" && Number.isFinite(timeoutMsRaw)
+        ? Math.max(1000, Math.floor(timeoutMsRaw))
+        : undefined;
+    let result;
+    try {
+      const config = loadConfig();
+      const configChannel = normalizeUpdateChannel(config.update?.channel);
+      const root =
+        (await resolveGenosOSPackageRoot({
+          moduleUrl: import.meta.url,
+          argv1: process.argv[1],
+          cwd: process.cwd(),
+        })) ?? process.cwd();
+      result = await runGatewayUpdate({
+        timeoutMs,
+        cwd: root,
+        argv1: process.argv[1],
+        channel: configChannel ?? undefined,
+      });
+    } catch (err) {
+      result = {
+        status: "error",
+        mode: "unknown",
+        reason: String(err),
+        steps: [],
+        durationMs: 0,
+      };
+    }
+    const payload = {
+      kind: "update",
+      status: result.status,
+      ts: Date.now(),
+      sessionKey,
+      deliveryContext,
+      threadId,
+      message: note ?? null,
+      doctorHint: formatDoctorNonInteractiveHint(),
+      stats: {
+        mode: result.mode,
+        root: result.root ?? undefined,
+        before: result.before ?? null,
+        after: result.after ?? null,
+        steps: result.steps.map((step) => ({
+          name: step.name,
+          command: step.command,
+          cwd: step.cwd,
+          durationMs: step.durationMs,
+          log: {
+            stdoutTail: step.stdoutTail ?? null,
+            stderrTail: step.stderrTail ?? null,
+            exitCode: step.exitCode ?? null,
+          },
+        })),
+        reason: result.reason ?? null,
+        durationMs: result.durationMs,
+      },
+    };
+    let sentinelPath = null;
+    try {
+      sentinelPath = await writeRestartSentinel(payload);
+    } catch {
+      sentinelPath = null;
+    }
+    const restart =
+      result.status === "ok"
+        ? scheduleGatewaySigusr1Restart({
+            delayMs: restartDelayMs,
+            reason: "update.run",
+          })
+        : null;
+    respond(
+      true,
+      {
+        ok: result.status !== "error",
+        result,
+        restart,
+        sentinel: {
+          path: sentinelPath,
+          payload,
+        },
+      },
+      undefined,
+    );
+  },
+};

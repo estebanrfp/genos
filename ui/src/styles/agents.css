@@ -1,0 +1,296 @@
+/* ===========================================
+   Agents
+   =========================================== */
+
+.agent-pill {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.agent-pill.warn {
+  color: var(--warn);
+  border-color: var(--warn);
+}
+
+/* Agent selector — compact bar for standalone Files/Tools tabs */
+.agent-selector__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.agent-selector__select {
+  flex: 1;
+  min-width: 0;
+}
+
+.agent-selector__error {
+  margin-top: 8px;
+}
+
+.agents-overview-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.agent-kv {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.agent-kv > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.agent-files-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.agent-files-list {
+  overflow-y: auto;
+  max-height: calc(100vh - 260px);
+}
+
+.agent-files-section {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.agent-files-section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.agent-files-section-label::-webkit-details-marker { display: none; }
+
+.agent-files-section-body {
+  padding-bottom: 4px;
+  margin-left: 12px;
+}
+
+.agent-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.agent-file-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.agent-file-row.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.agent-file-row.missing {
+  opacity: 0.5;
+}
+
+.agent-file-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.agent-file-row-name {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agent-file-row-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.agent-file-row:hover .agent-file-row-actions,
+.agent-file-row.active .agent-file-row-actions {
+  opacity: 1;
+}
+
+/* Base row padding — indentation handled by parent containers */
+.agent-file-row {
+  padding-left: 6px;
+  cursor: pointer;
+}
+
+/* Directory tree nodes */
+.agent-dir-node {
+  border: none;
+}
+
+.agent-dir-summary {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 5px 8px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  user-select: none;
+  letter-spacing: 0.04em;
+}
+
+.agent-dir-summary:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.agent-dir-summary::-webkit-details-marker { display: none; }
+
+.agent-dir-label {
+  color: inherit;
+}
+
+.agent-dir-body {
+  margin-left: 12px;
+}
+
+/* Image preview in editor */
+.agent-file-image-wrap {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-secondary, #0a0a0a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.agent-file-pdf-viewer {
+  width: 100%;
+  height: 70vh;
+  border: none;
+  border-radius: var(--radius-lg);
+  margin-top: 12px;
+  display: block;
+}
+
+.agent-file-preview-image {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  display: block;
+}
+
+.agent-files-editor {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  background: var(--card);
+}
+
+.agent-file-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.agent-skills-groups {
+  display: grid;
+  gap: 16px;
+}
+
+.agent-skills-group {
+  display: grid;
+  gap: 10px;
+}
+
+.agent-skills-group summary {
+  list-style: none;
+}
+
+.agent-skills-header {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  cursor: pointer;
+  gap: 8px;
+}
+
+.agent-skills-header > span:last-child {
+  margin-left: auto;
+}
+
+.agent-skills-group summary::-webkit-details-marker {
+  display: none;
+}
+
+.agent-skills-group summary::marker {
+  content: "";
+}
+
+.agent-skills-header::after {
+  content: "▸";
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform var(--duration-fast) ease;
+  margin-left: 8px;
+}
+
+.agent-skills-group[open] .agent-skills-header::after {
+  transform: rotate(90deg);
+}
+
+.skills-grid {
+  grid-template-columns: 1fr;
+}
+
+@container (min-width: 900px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .agent-files-grid {
+    grid-template-columns: 1fr;
+  }
+}

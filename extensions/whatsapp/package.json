@@ -1,0 +1,15 @@
+{
+  "name": "@genosos/whatsapp",
+  "version": "2026.2.18",
+  "private": true,
+  "description": "GenosOS WhatsApp channel plugin",
+  "type": "module",
+  "devDependencies": {
+    "genosos": "workspace:*"
+  },
+  "genosos": {
+    "extensions": [
+      "./index.js"
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+let normalizeEnvironment = function (value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "sandbox" || normalized === "production") {
+    return normalized;
+  }
+  return null;
+};
+import { defaultRuntime } from "../../runtime.js";
+import { getNodesTheme, runNodesCommand } from "./cli-utils.js";
+import { callGatewayCli, nodesCallOpts, resolveNodeId } from "./rpc.js";
+export function registerNodesPushCommand(nodes) {
+  nodesCallOpts(
+    nodes
+      .command("push")
+      .description("Send an APNs test push to an iOS node")
+      .requiredOption("--node <idOrNameOrIp>", "Node id, name, or IP")
+      .option("--title <text>", "Push title", "GenosOS")
+      .option("--body <text>", "Push body")
+      .option("--environment <sandbox|production>", "Override APNs environment")
+      .action(async (opts) => {
+        await runNodesCommand("push", async () => {
+          const nodeId = await resolveNodeId(opts, String(opts.node ?? ""));
+          const title = String(opts.title ?? "").trim() || "GenosOS";
+          const body = String(opts.body ?? "").trim() || `Push test for node ${nodeId}`;
+          const environment = normalizeEnvironment(opts.environment);
+          if (opts.environment && !environment) {
+            throw new Error("invalid --environment (use sandbox|production)");
+          }
+          const params = {
+            nodeId,
+            title,
+            body,
+          };
+          if (environment) {
+            params.environment = environment;
+          }
+          const result = await callGatewayCli("push.test", opts, params);
+          if (opts.json) {
+            defaultRuntime.log(JSON.stringify(result, null, 2));
+            return;
+          }
+          const parsed = typeof result === "object" && result !== null ? result : {};
+          const ok = parsed.ok === true;
+          const status = typeof parsed.status === "number" ? parsed.status : 0;
+          const reason =
+            typeof parsed.reason === "string" && parsed.reason.trim().length > 0
+              ? parsed.reason.trim()
+              : undefined;
+          const env =
+            typeof parsed.environment === "string" && parsed.environment.trim().length > 0
+              ? parsed.environment.trim()
+              : "unknown";
+          const { ok: okLabel, error: errorLabel } = getNodesTheme();
+          const label = ok ? okLabel : errorLabel;
+          defaultRuntime.log(label(`push.test status=${status} ok=${ok} env=${env}`));
+          if (reason) {
+            defaultRuntime.log(`reason: ${reason}`);
+          }
+        });
+      }),
+    { timeoutMs: 25000 },
+  );
+}

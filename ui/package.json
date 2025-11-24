@@ -1,0 +1,26 @@
+{
+  "name": "genosos-control-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "vitest run --config vitest.config.js"
+  },
+  "dependencies": {
+    "@noble/ed25519": "3.0.0",
+    "@simplewebauthn/browser": "13.2.2",
+    "dompurify": "^3.3.1",
+    "frappe-charts": "1.6.2",
+    "highlight.js": "11.11.1",
+    "lit": "^3.3.2",
+    "marked": "^17.0.3",
+    "vite": "7.3.1"
+  },
+  "devDependencies": {
+    "@vitest/browser-playwright": "4.0.18",
+    "playwright": "^1.58.2",
+    "vitest": "4.0.18"
+  }
+}

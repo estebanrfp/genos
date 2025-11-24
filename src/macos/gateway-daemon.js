@@ -1,0 +1,239 @@
+let argValue = function (args, flag) {
+    const idx = args.indexOf(flag);
+    if (idx < 0) {
+      return;
+    }
+    const value = args[idx + 1];
+    return value && !value.startsWith("-") ? value : undefined;
+  },
+  hasFlag = function (args, flag) {
+    return args.includes(flag);
+  };
+import process from "node:process";
+import { restartGatewayProcessWithFreshPid } from "../infra/process-respawn.js";
+const BUNDLED_VERSION =
+  (typeof __GENOS_VERSION__ === "string" && __GENOS_VERSION__) ||
+  process.env.GENOS_BUNDLED_VERSION ||
+  "0.0.0";
+const args = process.argv.slice(2);
+async function main() {
+  if (hasFlag(args, "--version") || hasFlag(args, "-v")) {
+    console.log(BUNDLED_VERSION);
+    process.exit(0);
+  }
+  if (typeof process.versions.bun === "string") {
+    const mod = await import("long");
+    const Long = mod.default ?? mod;
+    globalThis.Long = Long;
+  }
+  const [
+    { loadConfig },
+    { startGatewayServer },
+    { setGatewayWsLogStyle },
+    { setVerbose },
+    { acquireGatewayLock, GatewayLockError },
+    {
+      consumeGatewaySigusr1RestartAuthorization,
+      isGatewaySigusr1RestartExternallyAllowed,
+      markGatewaySigusr1RestartHandled,
+    },
+    { defaultRuntime },
+    { enableConsoleCapture, setConsoleTimestampPrefix },
+    commandQueueMod,
+    { createRestartIterationHook },
+  ] = await Promise.all([
+    import("../config/config.js"),
+    import("../gateway/server.js"),
+    import("../gateway/ws-logging.js"),
+    import("../globals.js"),
+    import("../infra/gateway-lock.js"),
+    import("../infra/restart.js"),
+    import("../runtime.js"),
+    import("../logging.js"),
+    import("../process/command-queue.js"),
+    import("../process/restart-recovery.js"),
+  ]);
+  enableConsoleCapture();
+  setConsoleTimestampPrefix(true);
+  setVerbose(hasFlag(args, "--verbose"));
+  const wsLogRaw = hasFlag(args, "--compact") ? "compact" : argValue(args, "--ws-log");
+  const wsLogStyle = wsLogRaw === "compact" ? "compact" : wsLogRaw === "full" ? "full" : "auto";
+  setGatewayWsLogStyle(wsLogStyle);
+  const cfg = loadConfig();
+  const portRaw =
+    argValue(args, "--port") ??
+    process.env.GENOS_GATEWAY_PORT ??
+    process.env.GENOS_GATEWAY_PORT ??
+    (typeof cfg.gateway?.port === "number" ? String(cfg.gateway.port) : "") ??
+    "18789";
+  const port = Number.parseInt(portRaw, 10);
+  if (Number.isNaN(port) || port <= 0) {
+    defaultRuntime.error(`Invalid --port (${portRaw})`);
+    process.exit(1);
+  }
+  const bindRaw =
+    argValue(args, "--bind") ??
+    process.env.GENOS_GATEWAY_BIND ??
+    process.env.GENOS_GATEWAY_BIND ??
+    cfg.gateway?.bind ??
+    "loopback";
+  const bind =
+    bindRaw === "loopback" ||
+    bindRaw === "lan" ||
+    bindRaw === "auto" ||
+    bindRaw === "custom" ||
+    bindRaw === "tailnet"
+      ? bindRaw
+      : null;
+  if (!bind) {
+    defaultRuntime.error('Invalid --bind (use "loopback", "lan", "tailnet", "auto", or "custom")');
+    process.exit(1);
+  }
+  const token = argValue(args, "--token");
+  if (token) {
+    process.env.GENOS_GATEWAY_TOKEN = token;
+  }
+  let server = null;
+  let lock = null;
+  let shuttingDown = false;
+  let forceExitTimer = null;
+  let restartResolver = null;
+  const cleanupSignals = () => {
+    process.removeListener("SIGTERM", onSigterm);
+    process.removeListener("SIGINT", onSigint);
+    process.removeListener("SIGUSR1", onSigusr1);
+  };
+  const request = (action, signal) => {
+    if (shuttingDown) {
+      defaultRuntime.log(`gateway: received ${signal} during shutdown; ignoring`);
+      return;
+    }
+    shuttingDown = true;
+    const isRestart = action === "restart";
+    defaultRuntime.log(
+      `gateway: received ${signal}; ${isRestart ? "restarting" : "shutting down"}`,
+    );
+    const DRAIN_TIMEOUT_MS = 30000;
+    const SHUTDOWN_TIMEOUT_MS = 5000;
+    const forceExitMs = isRestart ? DRAIN_TIMEOUT_MS + SHUTDOWN_TIMEOUT_MS : SHUTDOWN_TIMEOUT_MS;
+    forceExitTimer = setTimeout(() => {
+      defaultRuntime.error("gateway: shutdown timed out; exiting without full cleanup");
+      cleanupSignals();
+      process.exit(0);
+    }, forceExitMs);
+    (async () => {
+      try {
+        if (isRestart) {
+          const activeTasks = commandQueueMod.getActiveTaskCount();
+          if (activeTasks > 0) {
+            defaultRuntime.log(
+              `gateway: draining ${activeTasks} active task(s) before restart (timeout ${DRAIN_TIMEOUT_MS}ms)`,
+            );
+            const { drained } = await commandQueueMod.waitForActiveTasks(DRAIN_TIMEOUT_MS);
+            if (drained) {
+              defaultRuntime.log("gateway: all active tasks drained");
+            } else {
+              defaultRuntime.log("gateway: drain timeout reached; proceeding with restart");
+            }
+          }
+        }
+        await server?.close({
+          reason: isRestart ? "gateway restarting" : "gateway stopping",
+          restartExpectedMs: isRestart ? 1500 : null,
+        });
+      } catch (err) {
+        defaultRuntime.error(`gateway: shutdown error: ${String(err)}`);
+      } finally {
+        if (forceExitTimer) {
+          clearTimeout(forceExitTimer);
+        }
+        server = null;
+        if (isRestart) {
+          const respawn = restartGatewayProcessWithFreshPid();
+          if (respawn.mode === "spawned" || respawn.mode === "supervised") {
+            const modeLabel =
+              respawn.mode === "spawned"
+                ? `spawned pid ${respawn.pid ?? "unknown"}`
+                : "supervisor restart";
+            defaultRuntime.log(`gateway: restart mode full process restart (${modeLabel})`);
+            cleanupSignals();
+            process.exit(0);
+          } else {
+            if (respawn.mode === "failed") {
+              defaultRuntime.log(
+                `gateway: full process restart failed (${respawn.detail ?? "unknown error"}); falling back to in-process restart`,
+              );
+            } else {
+              defaultRuntime.log("gateway: restart mode in-process restart (GENOS_NO_RESPAWN)");
+            }
+            shuttingDown = false;
+            restartResolver?.();
+          }
+        } else {
+          cleanupSignals();
+          process.exit(0);
+        }
+      }
+    })();
+  };
+  const onSigterm = () => {
+    defaultRuntime.log("gateway: signal SIGTERM received");
+    request("stop", "SIGTERM");
+  };
+  const onSigint = () => {
+    defaultRuntime.log("gateway: signal SIGINT received");
+    request("stop", "SIGINT");
+  };
+  const onSigusr1 = () => {
+    defaultRuntime.log("gateway: signal SIGUSR1 received");
+    const authorized = consumeGatewaySigusr1RestartAuthorization();
+    if (!authorized && !isGatewaySigusr1RestartExternallyAllowed()) {
+      defaultRuntime.log(
+        "gateway: SIGUSR1 restart ignored (not authorized; enable commands.restart or use gateway tool).",
+      );
+      return;
+    }
+    markGatewaySigusr1RestartHandled();
+    request("restart", "SIGUSR1");
+  };
+  process.on("SIGTERM", onSigterm);
+  process.on("SIGINT", onSigint);
+  process.on("SIGUSR1", onSigusr1);
+  try {
+    try {
+      lock = await acquireGatewayLock();
+    } catch (err) {
+      if (err instanceof GatewayLockError) {
+        defaultRuntime.error(`Gateway start blocked: ${err.message}`);
+        process.exit(1);
+      }
+      throw err;
+    }
+    const onIteration = createRestartIterationHook(() => {
+      commandQueueMod.resetAllLanes();
+    });
+    while (true) {
+      onIteration();
+      try {
+        server = await startGatewayServer(port, { bind });
+      } catch (err) {
+        cleanupSignals();
+        defaultRuntime.error(`Gateway failed to start: ${String(err)}`);
+        process.exit(1);
+      }
+      await new Promise((resolve) => {
+        restartResolver = resolve;
+      });
+    }
+  } finally {
+    await lock?.release();
+    cleanupSignals();
+  }
+}
+main().catch((err) => {
+  console.error(
+    "[genosos] Gateway daemon failed:",
+    err instanceof Error ? (err.stack ?? err.message) : err,
+  );
+  process.exit(1);
+});

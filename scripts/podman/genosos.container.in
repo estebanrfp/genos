@@ -1,0 +1,26 @@
+# GenosOS gateway — Podman Quadlet (rootless)
+# Installed by setup-podman.sh into genosos's ~/.config/containers/systemd/
+# {{GENOS_HOME}} is replaced at install time.
+
+[Unit]
+Description=GenosOS gateway (rootless Podman)
+
+[Container]
+Image=genosos:local
+ContainerName=genosos
+UserNS=keep-id
+Volume={{GENOS_HOME}}/.genos:/home/node/.genos
+EnvironmentFile={{GENOS_HOME}}/.genos/.env
+Environment=HOME=/home/node
+Environment=TERM=xterm-256color
+PublishPort=18789:18789
+PublishPort=18790:18790
+Pull=never
+Exec=node dist/index.js gateway --bind lan --port 18789
+
+[Service]
+TimeoutStartSec=300
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

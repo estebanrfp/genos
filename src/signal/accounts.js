@@ -1,0 +1,48 @@
+let resolveAccountConfig = function (cfg, accountId) {
+    const accounts = cfg.channels?.signal?.accounts;
+    if (!accounts || typeof accounts !== "object") {
+      return;
+    }
+    return accounts[accountId];
+  },
+  mergeSignalAccountConfig = function (cfg, accountId) {
+    const { accounts: _ignored, ...base } = cfg.channels?.signal ?? {};
+    const account = resolveAccountConfig(cfg, accountId) ?? {};
+    return { ...base, ...account };
+  };
+import { createAccountListHelpers } from "../channels/plugins/account-helpers.js";
+import { normalizeAccountId } from "../routing/session-key.js";
+const { listAccountIds, resolveDefaultAccountId } = createAccountListHelpers("signal");
+export const listSignalAccountIds = listAccountIds;
+export const resolveDefaultSignalAccountId = resolveDefaultAccountId;
+export function resolveSignalAccount(params) {
+  const accountId = normalizeAccountId(params.accountId);
+  const baseEnabled = params.cfg.channels?.signal?.enabled !== false;
+  const merged = mergeSignalAccountConfig(params.cfg, accountId);
+  const accountEnabled = merged.enabled !== false;
+  const enabled = baseEnabled && accountEnabled;
+  const host = merged.httpHost?.trim() || "127.0.0.1";
+  const port = merged.httpPort ?? 8080;
+  const baseUrl = merged.httpUrl?.trim() || `http://${host}:${port}`;
+  const configured = Boolean(
+    merged.account?.trim() ||
+    merged.httpUrl?.trim() ||
+    merged.cliPath?.trim() ||
+    merged.httpHost?.trim() ||
+    typeof merged.httpPort === "number" ||
+    typeof merged.autoStart === "boolean",
+  );
+  return {
+    accountId,
+    enabled,
+    name: merged.name?.trim() || undefined,
+    baseUrl,
+    configured,
+    config: merged,
+  };
+}
+export function listEnabledSignalAccounts(cfg) {
+  return listSignalAccountIds(cfg)
+    .map((accountId) => resolveSignalAccount({ cfg, accountId }))
+    .filter((account) => account.enabled);
+}

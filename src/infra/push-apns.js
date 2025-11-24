@@ -1,0 +1,367 @@
+let resolveApnsRegistrationPath = function (baseDir) {
+    const root = baseDir ?? resolveStateDir();
+    return path.join(root, APNS_STATE_FILENAME);
+  },
+  normalizeNodeId = function (value) {
+    return value.trim();
+  },
+  normalizeApnsToken = function (value) {
+    return value
+      .trim()
+      .replace(/[<>\s]/g, "")
+      .toLowerCase();
+  },
+  normalizeTopic = function (value) {
+    return value.trim();
+  },
+  isLikelyApnsToken = function (value) {
+    return /^[0-9a-f]{32,}$/i.test(value);
+  },
+  parseReason = function (body) {
+    const trimmed = body.trim();
+    if (!trimmed) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(trimmed);
+      return typeof parsed.reason === "string" && parsed.reason.trim().length > 0
+        ? parsed.reason.trim()
+        : trimmed.slice(0, 200);
+    } catch {
+      return trimmed.slice(0, 200);
+    }
+  },
+  toBase64UrlBytes = function (value) {
+    return Buffer.from(value)
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/g, "");
+  },
+  toBase64UrlJson = function (value) {
+    return toBase64UrlBytes(Buffer.from(JSON.stringify(value)));
+  },
+  getJwtCacheKey = function (auth) {
+    const keyHash = createHash("sha256").update(auth.privateKey).digest("hex");
+    return `${auth.teamId}:${auth.keyId}:${keyHash}`;
+  },
+  getApnsBearerToken = function (auth, nowMs = Date.now()) {
+    const cacheKey = getJwtCacheKey(auth);
+    if (cachedJwt && cachedJwt.cacheKey === cacheKey && nowMs < cachedJwt.expiresAtMs) {
+      return cachedJwt.token;
+    }
+    const iat = Math.floor(nowMs / 1000);
+    const header = toBase64UrlJson({ alg: "ES256", kid: auth.keyId, typ: "JWT" });
+    const payload = toBase64UrlJson({ iss: auth.teamId, iat });
+    const signingInput = `${header}.${payload}`;
+    const signature = signJwt("sha256", Buffer.from(signingInput, "utf8"), {
+      key: createPrivateKey(auth.privateKey),
+      dsaEncoding: "ieee-p1363",
+    });
+    const token = `${signingInput}.${toBase64UrlBytes(signature)}`;
+    cachedJwt = {
+      cacheKey,
+      token,
+      expiresAtMs: nowMs + APNS_JWT_TTL_MS,
+    };
+    return token;
+  },
+  normalizePrivateKey = function (value) {
+    return value.trim().replace(/\\n/g, "\n");
+  },
+  normalizeNonEmptyString = function (value) {
+    const trimmed = value?.trim() ?? "";
+    return trimmed.length > 0 ? trimmed : null;
+  },
+  resolveApnsTimeoutMs = function (timeoutMs) {
+    return typeof timeoutMs === "number" && Number.isFinite(timeoutMs)
+      ? Math.max(1000, Math.trunc(timeoutMs))
+      : DEFAULT_APNS_TIMEOUT_MS;
+  },
+  resolveApnsSendContext = function (params) {
+    const token = normalizeApnsToken(params.registration.token);
+    if (!isLikelyApnsToken(token)) {
+      throw new Error("invalid APNs token");
+    }
+    const topic = normalizeTopic(params.registration.topic);
+    if (!topic) {
+      throw new Error("topic required");
+    }
+    return {
+      token,
+      topic,
+      environment: params.registration.environment,
+      bearerToken: getApnsBearerToken(params.auth),
+    };
+  },
+  toApnsPushResult = function (params) {
+    return {
+      ok: params.response.status === 200,
+      status: params.response.status,
+      apnsId: params.response.apnsId,
+      reason: parseReason(params.response.body),
+      tokenSuffix: params.token.slice(-8),
+      topic: params.topic,
+      environment: params.environment,
+    };
+  };
+import { createHash, createPrivateKey, sign as signJwt } from "node:crypto";
+import fs from "node:fs/promises";
+import http2 from "node:http2";
+import path from "node:path";
+import { resolveStateDir } from "../config/paths.js";
+import { createAsyncLock, readJsonFile, writeJsonAtomic } from "./json-files.js";
+const APNS_STATE_FILENAME = "push/apns-registrations.json";
+const APNS_JWT_TTL_MS = 3000000;
+const DEFAULT_APNS_TIMEOUT_MS = 1e4;
+const withLock = createAsyncLock();
+let cachedJwt = null;
+async function loadRegistrationsState(baseDir) {
+  const filePath = resolveApnsRegistrationPath(baseDir);
+  const existing = await readJsonFile(filePath);
+  if (!existing || typeof existing !== "object") {
+    return { registrationsByNodeId: {} };
+  }
+  const registrations =
+    existing.registrationsByNodeId &&
+    typeof existing.registrationsByNodeId === "object" &&
+    !Array.isArray(existing.registrationsByNodeId)
+      ? existing.registrationsByNodeId
+      : {};
+  return { registrationsByNodeId: registrations };
+}
+async function persistRegistrationsState(state, baseDir) {
+  const filePath = resolveApnsRegistrationPath(baseDir);
+  await writeJsonAtomic(filePath, state);
+}
+export function normalizeApnsEnvironment(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "sandbox" || normalized === "production") {
+    return normalized;
+  }
+  return null;
+}
+export async function registerApnsToken(params) {
+  const nodeId = normalizeNodeId(params.nodeId);
+  const token = normalizeApnsToken(params.token);
+  const topic = normalizeTopic(params.topic);
+  const environment = normalizeApnsEnvironment(params.environment) ?? "sandbox";
+  if (!nodeId) {
+    throw new Error("nodeId required");
+  }
+  if (!topic) {
+    throw new Error("topic required");
+  }
+  if (!isLikelyApnsToken(token)) {
+    throw new Error("invalid APNs token");
+  }
+  return await withLock(async () => {
+    const state = await loadRegistrationsState(params.baseDir);
+    const next = {
+      nodeId,
+      token,
+      topic,
+      environment,
+      updatedAtMs: Date.now(),
+    };
+    state.registrationsByNodeId[nodeId] = next;
+    await persistRegistrationsState(state, params.baseDir);
+    return next;
+  });
+}
+export async function loadApnsRegistration(nodeId, baseDir) {
+  const normalizedNodeId = normalizeNodeId(nodeId);
+  if (!normalizedNodeId) {
+    return null;
+  }
+  const state = await loadRegistrationsState(baseDir);
+  return state.registrationsByNodeId[normalizedNodeId] ?? null;
+}
+export async function resolveApnsAuthConfigFromEnv(env = process.env) {
+  const teamId = normalizeNonEmptyString(env.GENOS_APNS_TEAM_ID);
+  const keyId = normalizeNonEmptyString(env.GENOS_APNS_KEY_ID);
+  if (!teamId || !keyId) {
+    return {
+      ok: false,
+      error: "APNs auth missing: set GENOS_APNS_TEAM_ID and GENOS_APNS_KEY_ID",
+    };
+  }
+  const inlineKeyRaw =
+    normalizeNonEmptyString(env.GENOS_APNS_PRIVATE_KEY_P8) ??
+    normalizeNonEmptyString(env.GENOS_APNS_PRIVATE_KEY);
+  if (inlineKeyRaw) {
+    return {
+      ok: true,
+      value: {
+        teamId,
+        keyId,
+        privateKey: normalizePrivateKey(inlineKeyRaw),
+      },
+    };
+  }
+  const keyPath = normalizeNonEmptyString(env.GENOS_APNS_PRIVATE_KEY_PATH);
+  if (!keyPath) {
+    return {
+      ok: false,
+      error:
+        "APNs private key missing: set GENOS_APNS_PRIVATE_KEY_P8 or GENOS_APNS_PRIVATE_KEY_PATH",
+    };
+  }
+  try {
+    const privateKey = normalizePrivateKey(await fs.readFile(keyPath, "utf8"));
+    return {
+      ok: true,
+      value: {
+        teamId,
+        keyId,
+        privateKey,
+      },
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      ok: false,
+      error: `failed reading GENOS_APNS_PRIVATE_KEY_PATH (${keyPath}): ${message}`,
+    };
+  }
+}
+async function sendApnsRequest(params) {
+  const authority =
+    params.environment === "production"
+      ? "https://api.push.apple.com"
+      : "https://api.sandbox.push.apple.com";
+  const body = JSON.stringify(params.payload);
+  const requestPath = `/3/device/${params.token}`;
+  return await new Promise((resolve, reject) => {
+    const client = http2.connect(authority);
+    let settled = false;
+    const fail = (err) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      client.destroy();
+      reject(err);
+    };
+    const finish = (result) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      client.close();
+      resolve(result);
+    };
+    client.once("error", (err) => fail(err));
+    const req = client.request({
+      ":method": "POST",
+      ":path": requestPath,
+      authorization: `bearer ${params.bearerToken}`,
+      "apns-topic": params.topic,
+      "apns-push-type": params.pushType,
+      "apns-priority": params.priority,
+      "apns-expiration": "0",
+      "content-type": "application/json",
+      "content-length": Buffer.byteLength(body).toString(),
+    });
+    let statusCode = 0;
+    let apnsId;
+    let responseBody = "";
+    req.setEncoding("utf8");
+    req.setTimeout(params.timeoutMs, () => {
+      req.close(http2.constants.NGHTTP2_CANCEL);
+      fail(new Error(`APNs request timed out after ${params.timeoutMs}ms`));
+    });
+    req.on("response", (headers) => {
+      const statusHeader = headers[":status"];
+      statusCode = typeof statusHeader === "number" ? statusHeader : Number(statusHeader ?? 0);
+      const idHeader = headers["apns-id"];
+      if (typeof idHeader === "string" && idHeader.trim().length > 0) {
+        apnsId = idHeader.trim();
+      }
+    });
+    req.on("data", (chunk) => {
+      if (typeof chunk === "string") {
+        responseBody += chunk;
+      }
+    });
+    req.on("end", () => {
+      finish({ status: statusCode, apnsId, body: responseBody });
+    });
+    req.on("error", (err) => fail(err));
+    req.end(body);
+  });
+}
+export async function sendApnsAlert(params) {
+  const { token, topic, environment, bearerToken } = resolveApnsSendContext({
+    auth: params.auth,
+    registration: params.registration,
+  });
+  const payload = {
+    aps: {
+      alert: {
+        title: params.title,
+        body: params.body,
+      },
+      sound: "default",
+    },
+    genosos: {
+      kind: "push.test",
+      nodeId: params.nodeId,
+      ts: Date.now(),
+    },
+  };
+  const sender = params.requestSender ?? sendApnsRequest;
+  const response = await sender({
+    token,
+    topic,
+    environment,
+    bearerToken,
+    payload,
+    timeoutMs: resolveApnsTimeoutMs(params.timeoutMs),
+    pushType: "alert",
+    priority: "10",
+  });
+  return toApnsPushResult({
+    response,
+    token,
+    topic,
+    environment,
+  });
+}
+export async function sendApnsBackgroundWake(params) {
+  const { token, topic, environment, bearerToken } = resolveApnsSendContext({
+    auth: params.auth,
+    registration: params.registration,
+  });
+  const payload = {
+    aps: {
+      "content-available": 1,
+    },
+    genosos: {
+      kind: "node.wake",
+      reason: params.wakeReason ?? "node.invoke",
+      nodeId: params.nodeId,
+      ts: Date.now(),
+    },
+  };
+  const sender = params.requestSender ?? sendApnsRequest;
+  const response = await sender({
+    token,
+    topic,
+    environment,
+    bearerToken,
+    payload,
+    timeoutMs: resolveApnsTimeoutMs(params.timeoutMs),
+    pushType: "background",
+    priority: "5",
+  });
+  return toApnsPushResult({
+    response,
+    token,
+    topic,
+    environment,
+  });
+}

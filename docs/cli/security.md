@@ -1,0 +1,80 @@
+---
+summary: "CLI reference for `genosos security` (audit and fix common security footguns)"
+read_when:
+  - You want to run a quick security audit on config/state
+  - You want to apply safe “fix” suggestions (chmod, tighten defaults)
+title: "security"
+---
+
+# `genosos security`
+
+Security tools (audit + optional fixes).
+
+Related:
+
+- Security guide: [Security](/gateway/security)
+
+## Audit
+
+```bash
+genosos security audit
+genosos security audit --deep
+genosos security audit --fix
+genosos security audit --json
+```
+
+The audit warns when multiple DM senders share the main session and recommends **secure DM mode**: `session.dmScope="per-channel-peer"` (or `per-account-channel-peer` for multi-account channels) for shared inboxes.
+It also warns when small models (`<=300B`) are used without sandboxing and with web/browser tools enabled.
+For webhook ingress, it warns when `hooks.defaultSessionKey` is unset, when request `sessionKey` overrides are enabled, and when overrides are enabled without `hooks.allowedSessionKeyPrefixes`.
+It also warns when sandbox Docker settings are configured while sandbox mode is off, when `gateway.nodes.denyCommands` uses ineffective pattern-like/unknown entries, when global `tools.profile="minimal"` is overridden by agent tool profiles, and when installed extension plugin tools may be reachable under permissive tool policy.
+
+## JSON output
+
+Use `--json` for CI/policy checks:
+
+```bash
+genosos security audit --json | jq '.summary'
+genosos security audit --deep --json | jq '.findings[] | select(.severity=="critical") | .checkId'
+```
+
+If `--fix` and `--json` are combined, output includes both fix actions and final report:
+
+```bash
+genosos security audit --fix --json | jq '{fix: .fix.ok, summary: .report.summary}'
+```
+
+## What `--fix` changes
+
+`--fix` applies safe, deterministic remediations:
+
+- flips common `groupPolicy="open"` to `groupPolicy="allowlist"` (including account variants in supported channels)
+- sets `logging.redactSensitive` from `"off"` to `"tools"`
+- tightens permissions for state/config and common sensitive files (`credentials/*.json`, `auth-profiles.json`, `sessions.json`, session `*.jsonl`)
+
+`--fix` does **not**:
+
+- rotate tokens/passwords/API keys
+- disable tools (`gateway`, `cron`, `exec`, etc.)
+- change gateway bind/auth/network exposure choices
+- remove or rewrite plugins/skills
+
+## Related: `genosos vault`
+
+Manage the AES-256-GCM encrypted secret vault. Secrets are stored in `~/.genosv1/vault.enc` (owner-only, `chmod 600`).
+
+```bash
+genosos vault set <key> <value>   # Store or update a secret
+genosos vault get <key>           # Retrieve a secret value
+genosos vault list                # List all stored secret keys
+genosos vault delete <key>        # Remove a secret
+```
+
+Passphrase resolution order:
+
+1. `VAULT_PASSPHRASE` environment variable
+2. `VAULT_PASSPHRASE=` in `~/.genosv1/.env`
+3. Interactive prompt (stdin)
+
+Key derivation: PBKDF2 (100,000 iterations, SHA-512, 32-byte salt, 32-byte key). Each write uses a fresh 12-byte IV.
+
+See also: [Security](/gateway/security)

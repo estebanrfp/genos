@@ -1,0 +1,50 @@
+{
+  "accounting-firm": {
+    "description": "Accounting / tax firm / consultancy",
+    "keywords": ["accounting", "accountant", "tax", "bookkeeping", "fiscal"]
+  },
+  "content-creator": {
+    "description": "AI YouTuber / autonomous content creator",
+    "keywords": ["content", "creator", "youtube", "youtuber", "video", "streaming", "influencer"]
+  },
+  "dental-clinic": {
+    "description": "Dental clinic / medical office",
+    "keywords": ["dental", "dentist", "clinic", "orthodontics", "teeth"]
+  },
+  "gym-fitness": {
+    "description": "Gym / fitness center",
+    "keywords": ["gym", "fitness", "workout", "training", "crossfit"]
+  },
+  "hair-salon": {
+    "description": "Hair salon / beauty studio",
+    "keywords": ["salon", "hair", "beauty", "barber", "hairdresser"]
+  },
+  "hotel": {
+    "description": "Hotel / accommodation / hospitality",
+    "keywords": ["hotel", "hostel", "accommodation", "lodging", "hospitality", "booking"]
+  },
+  "law-firm": {
+    "description": "Law firm / legal consultancy",
+    "keywords": ["law", "lawyer", "legal", "attorney", "firm"]
+  },
+  "online-store": {
+    "description": "E-commerce / online store",
+    "keywords": ["store", "shop", "ecommerce", "e-commerce", "retail", "products"]
+  },
+  "real-estate": {
+    "description": "Real estate agency / property management",
+    "keywords": ["real estate", "property", "housing", "realty", "rent"]
+  },
+  "restaurant": {
+    "description": "Restaurant / cafe / food service",
+    "keywords": ["restaurant", "cafe", "food", "dining", "catering", "kitchen"]
+  },
+  "security-guard": {
+    "description": "Gateway security monitoring + audit automation",
+    "keywords": ["security", "guard", "audit", "monitor", "firewall"]
+  },
+  "seo-specialist": {
+    "description": "Site audits, keyword tracking, ranking monitoring",
+    "keywords": ["seo", "search engine", "ranking", "optimization"]
+  }
+}

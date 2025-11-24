@@ -1,0 +1,78 @@
+/* =============================================
+   STATS BAR — Response metrics below bubbles
+   ============================================= */
+
+/* Source indicator colors */
+:root {
+  --source-direct: #4ade80;   /* green  — direct response */
+  --source-prefetch: #60a5fa; /* blue   — memory prefetch */
+  --source-tool: #facc15;     /* yellow — tool call */
+  --source-exec: #f87171;     /* red    — command execution */
+}
+
+.stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+  user-select: none;
+  line-height: 1.4;
+}
+
+/* Show on group hover */
+.chat-group:hover .stats-bar,
+.stats-bar:hover {
+  opacity: 1;
+}
+
+.stats-bar__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.stats-bar__source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.stats-bar__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stats-bar__label {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.stats-bar__value {
+  color: var(--text);
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.stats-bar__sep {
+  width: 1px;
+  height: 10px;
+  margin: 0 6px;
+  background: var(--border);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* Light mode adjustments */
+:root[data-theme="light"] .stats-bar__value {
+  opacity: 0.7;
+}

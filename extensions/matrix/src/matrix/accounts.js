@@ -1,0 +1,102 @@
+let mergeAccountConfig = function (base, account) {
+    const merged = { ...base, ...account };
+    for (const key of ["dm", "actions"]) {
+      const b = base[key];
+      const o = account[key];
+      if (typeof b === "object" && b != null && typeof o === "object" && o != null) {
+        merged[key] = { ...b, ...o };
+      }
+    }
+    delete merged.accounts;
+    return merged;
+  },
+  listConfiguredAccountIds = function (cfg) {
+    const accounts = cfg.channels?.matrix?.accounts;
+    if (!accounts || typeof accounts !== "object") {
+      return [];
+    }
+    return [
+      ...new Set(
+        Object.keys(accounts)
+          .filter(Boolean)
+          .map((id) => normalizeAccountId(id)),
+      ),
+    ];
+  },
+  resolveAccountConfig = function (cfg, accountId) {
+    const accounts = cfg.channels?.matrix?.accounts;
+    if (!accounts || typeof accounts !== "object") {
+      return;
+    }
+    if (accounts[accountId]) {
+      return accounts[accountId];
+    }
+    const normalized = normalizeAccountId(accountId);
+    for (const key of Object.keys(accounts)) {
+      if (normalizeAccountId(key) === normalized) {
+        return accounts[key];
+      }
+    }
+    return;
+  };
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "genosos/plugin-sdk/account-id";
+import { resolveMatrixConfigForAccount } from "./client.js";
+import { credentialsMatchConfig, loadMatrixCredentials } from "./credentials.js";
+export function listMatrixAccountIds(cfg) {
+  const ids = listConfiguredAccountIds(cfg);
+  if (ids.length === 0) {
+    return [DEFAULT_ACCOUNT_ID];
+  }
+  return ids.toSorted((a, b) => a.localeCompare(b));
+}
+export function resolveDefaultMatrixAccountId(cfg) {
+  const ids = listMatrixAccountIds(cfg);
+  if (ids.includes(DEFAULT_ACCOUNT_ID)) {
+    return DEFAULT_ACCOUNT_ID;
+  }
+  return ids[0] ?? DEFAULT_ACCOUNT_ID;
+}
+export function resolveMatrixAccount(params) {
+  const accountId = normalizeAccountId(params.accountId);
+  const matrixBase = params.cfg.channels?.matrix ?? {};
+  const base = resolveMatrixAccountConfig({ cfg: params.cfg, accountId });
+  const enabled = base.enabled !== false && matrixBase.enabled !== false;
+  const resolved = resolveMatrixConfigForAccount(params.cfg, accountId, process.env);
+  const hasHomeserver = Boolean(resolved.homeserver);
+  const hasUserId = Boolean(resolved.userId);
+  const hasAccessToken = Boolean(resolved.accessToken);
+  const hasPassword = Boolean(resolved.password);
+  const hasPasswordAuth = hasUserId && hasPassword;
+  const stored = loadMatrixCredentials(process.env, accountId);
+  const hasStored =
+    stored && resolved.homeserver
+      ? credentialsMatchConfig(stored, {
+          homeserver: resolved.homeserver,
+          userId: resolved.userId || "",
+        })
+      : false;
+  const configured = hasHomeserver && (hasAccessToken || hasPasswordAuth || Boolean(hasStored));
+  return {
+    accountId,
+    enabled,
+    name: base.name?.trim() || undefined,
+    configured,
+    homeserver: resolved.homeserver || undefined,
+    userId: resolved.userId || undefined,
+    config: base,
+  };
+}
+export function resolveMatrixAccountConfig(params) {
+  const accountId = normalizeAccountId(params.accountId);
+  const matrixBase = params.cfg.channels?.matrix ?? {};
+  const accountConfig = resolveAccountConfig(params.cfg, accountId);
+  if (!accountConfig) {
+    return matrixBase;
+  }
+  return mergeAccountConfig(matrixBase, accountConfig);
+}
+export function listEnabledMatrixAccounts(cfg) {
+  return listMatrixAccountIds(cfg)
+    .map((accountId) => resolveMatrixAccount({ cfg, accountId }))
+    .filter((account) => account.enabled);
+}
