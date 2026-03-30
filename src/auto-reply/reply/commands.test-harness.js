@@ -1,0 +1,40 @@
+import { buildCommandContext } from "./commands.js";
+import { parseInlineDirectives } from "./directive-handling.js";
+export function buildCommandTestParams(commandBody, cfg, ctxOverrides, options) {
+  const ctx = {
+    Body: commandBody,
+    CommandBody: commandBody,
+    CommandSource: "text",
+    CommandAuthorized: true,
+    Provider: "whatsapp",
+    Surface: "whatsapp",
+    ...ctxOverrides,
+  };
+  const command = buildCommandContext({
+    ctx,
+    cfg,
+    isGroup: false,
+    triggerBodyNormalized: commandBody.trim().toLowerCase(),
+    commandAuthorized: true,
+  });
+  const params = {
+    ctx,
+    cfg,
+    command,
+    directives: parseInlineDirectives(commandBody),
+    elevated: { enabled: true, allowed: true, failures: [] },
+    sessionKey: "agent:main:main",
+    workspaceDir: options?.workspaceDir ?? "/tmp",
+    defaultGroupActivation: () => "mention",
+    resolvedVerboseLevel: "off",
+    resolvedReasoningLevel: "off",
+    resolveDefaultThinkingLevel: async () => {
+      return;
+    },
+    provider: "whatsapp",
+    model: "test-model",
+    contextTokens: 0,
+    isGroup: false,
+  };
+  return params;
+}

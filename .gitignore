@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnpm-store
+
+# Environment & secrets
+.env
+.env.*
+CLAUDE.md
+
+# Build output
+dist/
+coverage/
+*.tsbuildinfo
+*.bun-build
+
+# Lock files (pnpm-lock committed, others ignored)
+bun.lock
+bun.lockb
+package-lock.json
+
+# OS files
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/settings.json
+
+# Test artifacts
+__screenshots__/
+ui/playwright-report/
+ui/test-results/
+__genosos_vitest__/
+
+# Agent workspace & credentials (NEVER COMMIT)
+/memory/
+.agent/*.json
+!.agent/workflows/
+/local/
+
+# Docker overrides
+docker-compose.extra.yml
+
+# Local tooling
+.serena/
+.worktrees/
+.local/

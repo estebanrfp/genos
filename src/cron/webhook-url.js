@@ -1,0 +1,21 @@
+let isAllowedWebhookProtocol = function (protocol) {
+  return protocol === "http:" || protocol === "https:";
+};
+export function normalizeHttpWebhookUrl(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (!isAllowedWebhookProtocol(parsed.protocol)) {
+      return null;
+    }
+    return trimmed;
+  } catch {
+    return null;
+  }
+}

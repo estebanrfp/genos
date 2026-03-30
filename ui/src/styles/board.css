@@ -1,0 +1,330 @@
+/* ===========================================
+   Board — Overlay
+   =========================================== */
+
+.board-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.board-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  min-height: 200px;
+}
+
+.board-column {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 180px;
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out);
+}
+
+.board-column-header {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.board-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  cursor: default;
+  overflow: hidden;
+  transition:
+    border-color var(--duration-fast),
+    box-shadow var(--duration-fast),
+    transform var(--duration-fast);
+  animation: rise 0.35s var(--ease-out) backwards;
+}
+
+.board-card[draggable="true"] {
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-drag: element;
+}
+
+.board-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.board-card.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+}
+
+.board-column.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.board-card-title {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-card-desc {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.board-card-time {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-family: var(--mono);
+}
+
+.board-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.board-card--live {
+  cursor: default;
+  border-left: 3px solid var(--accent-2);
+}
+
+.board-card--live.board-card--draggable {
+  cursor: grab;
+  border-left-color: var(--warn);
+}
+
+.board-card-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.chip--xs {
+  font-size: 10px;
+  padding: 1px 6px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.board-chip-session { color: var(--info); border-color: var(--info); }
+.board-chip-cron { color: var(--warn); border-color: var(--warn); }
+.board-chip-agent { color: var(--accent-2); border-color: var(--accent-2); }
+.board-chip-channel { color: var(--accent); border-color: var(--accent); }
+
+.board-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.board-empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* Responsive: stack columns on narrow screens */
+@media (max-width: 1000px) {
+  .board-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .board-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Activity timeline */
+.board-activity {
+  display: grid;
+  gap: 8px;
+}
+
+.board-activity-entry {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  animation: rise 0.35s var(--ease-out) backwards;
+  font-size: 13px;
+}
+
+/* Search */
+.board-search-wrap {
+  margin-bottom: 16px;
+}
+
+.board-search-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.board-search-input:focus {
+  border-color: var(--ring);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.board-search-input::placeholder {
+  color: var(--muted);
+}
+
+mark {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Activity category chips */
+.board-chip-chat { color: var(--info); border-color: var(--info); }
+.board-activity-summary { color: var(--text); margin-left: 8px; }
+
+.chip-danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.chip-danger:hover {
+  background: var(--danger-subtle);
+}
+
+/* Cron board overlay — narrower + block layout (no flex column compression) */
+.cron-board-overlay__card {
+  width: min(1100px, calc(100vw - 48px));
+}
+
+.cron-board-overlay__card .settings-modal__content {
+  display: block;
+}
+
+.cron-board-overlay__active {
+  color: var(--success);
+}
+
+.cron-board-overlay__inactive {
+  color: var(--danger);
+}
+
+/* Logs view overlay */
+.logs-view-overlay__card {
+  width: min(1100px, calc(100vw - 48px));
+  height: min(80vh, calc(100vh - 48px));
+  display: flex;
+  flex-direction: column;
+}
+
+.logs-view-overlay__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.logs-view-overlay__body .card {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.logs-view-overlay__body .log-stream {
+  max-height: none;
+}
+
+/* ── Files browser overlay ──────────────────────────────────────────────────── */
+.files-browser-overlay__card {
+  width: min(1200px, calc(100vw - 48px));
+  height: min(85vh, calc(100vh - 48px));
+  display: flex;
+  flex-direction: column;
+}
+
+.files-browser-overlay__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.files-browser-overlay__body .card {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.files-browser-overlay__body .agent-files-editor {
+  min-height: 400px;
+}
+
+/* ── Skills overlay ─────────────────────────────────────────────────────────── */
+.skills-overlay__card {
+  width: min(900px, calc(100vw - 48px));
+  height: min(80vh, calc(100vh - 48px));
+  display: flex;
+  flex-direction: column;
+}
+
+.skills-overlay__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.skills-overlay__body .card {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+/* ── Providers overlay ─────────────────────────────────────────────────────── */
+.providers-overlay__card {
+  width: min(720px, calc(100vw - 48px));
+  max-height: min(85vh, 800px);
+  display: flex;
+  flex-direction: column;
+}
+
+.providers-overlay__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-2, 8px) var(--sp-3, 12px);
+}

@@ -1,0 +1,24 @@
+import { isTruthyEnvValue } from "../infra/env.js";
+import { startGmailWatcher } from "./gmail-watcher.js";
+export async function startGmailWatcherWithLogs(params) {
+  if (isTruthyEnvValue(process.env.GENOS_SKIP_GMAIL_WATCHER)) {
+    params.onSkipped?.();
+    return;
+  }
+  try {
+    const gmailResult = await startGmailWatcher(params.cfg);
+    if (gmailResult.started) {
+      params.log.info("gmail watcher started");
+      return;
+    }
+    if (
+      gmailResult.reason &&
+      gmailResult.reason !== "hooks not enabled" &&
+      gmailResult.reason !== "no gmail account configured"
+    ) {
+      params.log.warn(`gmail watcher not started: ${gmailResult.reason}`);
+    }
+  } catch (err) {
+    params.log.error(`gmail watcher failed to start: ${String(err)}`);
+  }
+}

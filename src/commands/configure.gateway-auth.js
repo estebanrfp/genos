@@ -1,0 +1,104 @@
+let sanitizeTokenValue = function (value) {
+  if (typeof value !== "string") {
+    return;
+  }
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "undefined" || trimmed === "null") {
+    return;
+  }
+  return trimmed;
+};
+import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
+import { promptAuthChoiceGrouped } from "./auth-choice-prompt.js";
+import { applyAuthChoice, resolvePreferredProviderForAuthChoice } from "./auth-choice.js";
+import {
+  applyModelAllowlist,
+  applyModelFallbacksFromSelection,
+  applyPrimaryModel,
+  promptDefaultModel,
+  promptModelAllowlist,
+} from "./model-picker.js";
+import { promptCustomApiConfig } from "./onboard-custom.js";
+import { randomToken } from "./onboard-helpers.js";
+const ANTHROPIC_OAUTH_MODEL_KEYS = [
+  "anthropic/claude-sonnet-4-6",
+  "anthropic/claude-opus-4-6",
+  "anthropic/claude-opus-4-5",
+  "anthropic/claude-sonnet-4-5",
+  "anthropic/claude-haiku-4-5",
+];
+export function buildGatewayAuthConfig(params) {
+  const allowTailscale = params.existing?.allowTailscale;
+  const base = {};
+  if (typeof allowTailscale === "boolean") {
+    base.allowTailscale = allowTailscale;
+  }
+  if (params.mode === "token") {
+    const token = sanitizeTokenValue(params.token) ?? randomToken();
+    return { ...base, mode: "token", token };
+  }
+  if (params.mode === "password") {
+    const password = params.password?.trim();
+    return { ...base, mode: "password", ...(password && { password }) };
+  }
+  if (params.mode === "trusted-proxy") {
+    if (!params.trustedProxy) {
+      throw new Error("trustedProxy config is required when mode is trusted-proxy");
+    }
+    return { ...base, mode: "trusted-proxy", trustedProxy: params.trustedProxy };
+  }
+  return base;
+}
+export async function promptAuthConfig(cfg, runtime, prompter) {
+  const authChoice = await promptAuthChoiceGrouped({
+    prompter,
+    store: ensureAuthProfileStore(undefined, {
+      allowKeychainPrompt: false,
+    }),
+    includeSkip: true,
+  });
+  let next = cfg;
+  if (authChoice === "custom-api-key") {
+    const customResult = await promptCustomApiConfig({ prompter, runtime, config: next });
+    next = customResult.config;
+  } else if (authChoice !== "skip") {
+    const applied = await applyAuthChoice({
+      authChoice,
+      config: next,
+      prompter,
+      runtime,
+      setDefaultModel: true,
+    });
+    next = applied.config;
+  } else {
+    const modelSelection = await promptDefaultModel({
+      config: next,
+      prompter,
+      allowKeep: true,
+      ignoreAllowlist: true,
+      preferredProvider: resolvePreferredProviderForAuthChoice(authChoice),
+    });
+    if (modelSelection.config) {
+      next = modelSelection.config;
+    }
+    if (modelSelection.model) {
+      next = applyPrimaryModel(next, modelSelection.model);
+    }
+  }
+  const anthropicOAuth =
+    authChoice === "setup-token" || authChoice === "token" || authChoice === "oauth";
+  if (authChoice !== "custom-api-key") {
+    const allowlistSelection = await promptModelAllowlist({
+      config: next,
+      prompter,
+      allowedKeys: anthropicOAuth ? ANTHROPIC_OAUTH_MODEL_KEYS : undefined,
+      initialSelections: anthropicOAuth ? ["anthropic/claude-sonnet-4-6"] : undefined,
+      message: anthropicOAuth ? "Anthropic OAuth models" : undefined,
+    });
+    if (allowlistSelection.models) {
+      next = applyModelAllowlist(next, allowlistSelection.models);
+      next = applyModelFallbacksFromSelection(next, allowlistSelection.models);
+    }
+  }
+  return next;
+}

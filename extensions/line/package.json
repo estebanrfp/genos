@@ -1,0 +1,30 @@
+{
+  "name": "@genosos/line",
+  "version": "2026.2.18",
+  "private": true,
+  "description": "GenosOS LINE channel plugin",
+  "type": "module",
+  "devDependencies": {
+    "genosos": "workspace:*"
+  },
+  "genosos": {
+    "extensions": [
+      "./index.js"
+    ],
+    "channel": {
+      "id": "line",
+      "label": "LINE",
+      "selectionLabel": "LINE (Messaging API)",
+      "docsPath": "/channels/line",
+      "docsLabel": "line",
+      "blurb": "LINE Messaging API bot for Japan/Taiwan/Thailand markets.",
+      "order": 75,
+      "quickstartAllowFrom": true
+    },
+    "install": {
+      "npmSpec": "@genosos/line",
+      "localPath": "extensions/line",
+      "defaultChoice": "npm"
+    }
+  }
+}

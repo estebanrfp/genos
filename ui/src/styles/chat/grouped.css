@@ -1,0 +1,289 @@
+/* =============================================
+   GROUPED CHAT LAYOUT — CLI Style
+   ============================================= */
+
+/* Chat Group Layout — vertical, compact */
+.chat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 6px 12px 4px;
+}
+
+/* User messages — plain, no decoration */
+.chat-group.user {
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+.chat-group-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 100%;
+  padding-left: var(--cli-indent);
+}
+
+/* Remove right-alignment for user */
+.chat-group.user .chat-group-messages {
+  align-items: flex-start;
+}
+
+.chat-group.user .chat-group-footer {
+  justify-content: flex-start;
+}
+
+/* Header — prompt symbol + name + timestamp inline */
+.chat-group-header {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 1px;
+}
+
+/* Footer (stats bar) */
+.chat-group-footer {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-top: 2px;
+  padding-left: var(--cli-indent);
+}
+
+.chat-sender-name {
+  font-weight: 600;
+  font-size: 13px;
+  font-family: var(--mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+
+.chat-group-timestamp {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* Chat divider (compaction marker) */
+.chat-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 12px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.chat-divider__line {
+  flex: 1 1 0;
+  height: 1px;
+  background: var(--border);
+  opacity: 0.6;
+}
+
+.chat-divider__label {
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--mono);
+}
+
+.chat-divider--clickable {
+  cursor: pointer;
+}
+
+/* Avatar — killed */
+.chat-avatar {
+  display: none !important;
+}
+
+/* CLI Prompt Symbol */
+.cli-prompt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.cli-prompt--error {
+  color: var(--danger);
+}
+
+.cli-prompt--warning {
+  color: var(--warn);
+}
+
+.cli-prompt--user {
+  color: var(--cli-prompt-user);
+}
+
+.cli-prompt--assistant {
+  color: var(--cli-prompt-assistant);
+}
+
+.cli-prompt--tool {
+  color: var(--cli-prompt-tool);
+}
+
+.cli-prompt--system {
+  color: var(--cli-prompt-system);
+}
+
+/* System messages — muted, smaller */
+.chat-group.system .chat-group-messages {
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+.chat-group.system .chat-sender-name {
+  color: var(--muted);
+}
+
+/* Bubble — fully transparent, zero decoration */
+.chat-bubble {
+  position: relative;
+  display: block;
+  border: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  transition: none;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.chat-bubble.has-copy {
+  padding-right: 28px !important;
+}
+
+/* Copy button */
+.chat-copy-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  border-radius: 4px;
+  padding: 3px 5px;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease-out, background 120ms ease-out;
+}
+
+.chat-copy-btn__icon {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  position: relative;
+}
+
+.chat-copy-btn__icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chat-copy-btn__icon-copy,
+.chat-copy-btn__icon-check {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 150ms ease;
+}
+
+.chat-copy-btn__icon-check {
+  opacity: 0;
+}
+
+.chat-copy-btn[data-copied="1"] .chat-copy-btn__icon-copy {
+  opacity: 0;
+}
+
+.chat-copy-btn[data-copied="1"] .chat-copy-btn__icon-check {
+  opacity: 1;
+}
+
+.chat-bubble:hover .chat-copy-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.chat-copy-btn:hover {
+  background: var(--bg-hover);
+}
+
+.chat-copy-btn[data-copying="1"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chat-copy-btn[data-error="1"] {
+  opacity: 1;
+  pointer-events: auto;
+  border-color: var(--danger-subtle);
+  background: var(--danger-subtle);
+  color: var(--danger);
+}
+
+.chat-copy-btn[data-copied="1"] {
+  opacity: 1;
+  pointer-events: auto;
+  border-color: var(--ok-subtle);
+  background: var(--ok-subtle);
+  color: var(--ok);
+}
+
+.chat-copy-btn:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .chat-copy-btn {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Streaming — no animation to avoid visual jitter during rapid deltas */
+.chat-bubble.streaming {
+  opacity: 1;
+}
+
+/* Fade-in — opacity only */
+.chat-bubble.fade-in {
+  animation: cli-fade-in 200ms ease-out;
+}
+
+@keyframes cli-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

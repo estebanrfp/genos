@@ -1,0 +1,17 @@
+import path from "node:path";
+import { resolveUserPath } from "../utils.js";
+export function normalizeWorkspaceDir(workspaceDir) {
+  const trimmed = workspaceDir?.trim();
+  if (!trimmed) {
+    return null;
+  }
+  const expanded = trimmed.startsWith("~") ? resolveUserPath(trimmed) : trimmed;
+  const resolved = path.resolve(expanded);
+  if (resolved === path.parse(resolved).root) {
+    return null;
+  }
+  return resolved;
+}
+export function resolveWorkspaceRoot(workspaceDir) {
+  return normalizeWorkspaceDir(workspaceDir) ?? process.cwd();
+}

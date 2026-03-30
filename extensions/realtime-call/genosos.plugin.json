@@ -1,0 +1,197 @@
+{
+  "id": "realtime-call",
+  "description": "Bidirectional voice calls via OpenAI Realtime API. Supports Twilio + Cloudflare Tunnel (recommended), ngrok, or Tailscale for public webhook exposure.",
+  "uiHints": {
+    "provider": {
+      "label": "Provider",
+      "help": "Use twilio for Realtime bidirectional voice."
+    },
+    "fromNumber": {
+      "label": "From Number",
+      "placeholder": "+15550001234"
+    },
+    "toNumber": {
+      "label": "Default To Number",
+      "placeholder": "+15550001234"
+    },
+    "inboundPolicy": {
+      "label": "Inbound Policy"
+    },
+    "allowFrom": {
+      "label": "Inbound Allowlist"
+    },
+    "inboundGreeting": {
+      "label": "Inbound Greeting"
+    },
+    "twilio.accountSid": {
+      "label": "Twilio Account SID"
+    },
+    "twilio.authToken": {
+      "label": "Twilio Auth Token",
+      "sensitive": true
+    },
+    "streaming.enabled": {
+      "label": "Enable Streaming"
+    },
+    "streaming.mode": {
+      "label": "Streaming Mode",
+      "help": "realtime-conversation (bidirectional AI voice) or stt-only (STT→LLM→TTS)"
+    },
+    "streaming.realtimeModel": {
+      "label": "Realtime Model",
+      "advanced": true
+    },
+    "streaming.realtimeVoice": {
+      "label": "Realtime Voice",
+      "advanced": true
+    },
+    "streaming.realtimeInstructions": {
+      "label": "Realtime Instructions",
+      "advanced": true
+    },
+    "streaming.openaiApiKey": {
+      "label": "OpenAI Realtime API Key",
+      "sensitive": true,
+      "advanced": true
+    },
+    "tunnel.provider": {
+      "label": "Tunnel Provider",
+      "help": "cloudflare (recommended, fixed URL, faster), ngrok, or tailscale-serve/funnel"
+    },
+    "tunnel.ngrokAuthToken": {
+      "label": "ngrok Auth Token",
+      "sensitive": true
+    },
+    "tunnel.cloudflareToken": {
+      "label": "Cloudflare Tunnel Token",
+      "sensitive": true
+    },
+    "tunnel.cloudflareHostname": {
+      "label": "Cloudflare Tunnel Hostname",
+      "help": "Fixed domain for the tunnel (e.g. voice.example.com)"
+    },
+    "serve.port": {
+      "label": "Webhook Port",
+      "advanced": true
+    },
+    "outbound.defaultMode": {
+      "label": "Default Call Mode",
+      "advanced": true
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "enabled": { "type": "boolean" },
+      "provider": { "type": "string", "enum": ["telnyx", "twilio", "plivo", "mock"] },
+      "telnyx": {
+        "type": "object",
+        "properties": {
+          "apiKey": { "type": "string" },
+          "connectionId": { "type": "string" },
+          "publicKey": { "type": "string" }
+        }
+      },
+      "twilio": {
+        "type": "object",
+        "properties": {
+          "accountSid": { "type": "string" },
+          "authToken": { "type": "string" }
+        }
+      },
+      "plivo": {
+        "type": "object",
+        "properties": {
+          "authId": { "type": "string" },
+          "authToken": { "type": "string" }
+        }
+      },
+      "fromNumber": { "type": "string", "pattern": "^\\+[1-9]\\d{1,14}$" },
+      "toNumber": { "type": "string", "pattern": "^\\+[1-9]\\d{1,14}$" },
+      "inboundPolicy": { "type": "string", "enum": ["disabled", "allowlist", "pairing", "open"] },
+      "allowFrom": {
+        "type": "array",
+        "items": { "type": "string", "pattern": "^\\+[1-9]\\d{1,14}$" }
+      },
+      "inboundGreeting": { "type": "string" },
+      "outbound": {
+        "type": "object",
+        "properties": {
+          "defaultMode": { "type": "string", "enum": ["notify", "conversation"] },
+          "notifyHangupDelaySec": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "maxDurationSeconds": { "type": "integer", "minimum": 1 },
+      "silenceTimeoutMs": { "type": "integer", "minimum": 1 },
+      "transcriptTimeoutMs": { "type": "integer", "minimum": 1 },
+      "ringTimeoutMs": { "type": "integer", "minimum": 1 },
+      "maxConcurrentCalls": { "type": "integer", "minimum": 1 },
+      "serve": {
+        "type": "object",
+        "properties": {
+          "port": { "type": "integer", "minimum": 1 },
+          "bind": { "type": "string" },
+          "path": { "type": "string" }
+        }
+      },
+      "tailscale": {
+        "type": "object",
+        "properties": {
+          "mode": { "type": "string", "enum": ["off", "serve", "funnel"] },
+          "path": { "type": "string" }
+        }
+      },
+      "tunnel": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": ["none", "ngrok", "cloudflare", "tailscale-serve", "tailscale-funnel"]
+          },
+          "ngrokAuthToken": { "type": "string" },
+          "ngrokDomain": { "type": "string" },
+          "allowNgrokFreeTierLoopbackBypass": { "type": "boolean" },
+          "cloudflareToken": { "type": "string" },
+          "cloudflareHostname": { "type": "string" }
+        }
+      },
+      "webhookSecurity": {
+        "type": "object",
+        "properties": {
+          "allowedHosts": { "type": "array", "items": { "type": "string" } },
+          "trustForwardingHeaders": { "type": "boolean" },
+          "trustedProxyIPs": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "streaming": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "mode": { "type": "string", "enum": ["stt-only", "realtime-conversation"] },
+          "sttProvider": { "type": "string", "enum": ["openai-realtime"] },
+          "openaiApiKey": { "type": "string" },
+          "sttModel": { "type": "string" },
+          "realtimeModel": { "type": "string" },
+          "realtimeVoice": { "type": "string" },
+          "realtimeInstructions": { "type": "string" },
+          "silenceDurationMs": { "type": "integer", "minimum": 1 },
+          "vadThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+          "streamPath": { "type": "string" }
+        }
+      },
+      "publicUrl": { "type": "string" },
+      "skipSignatureVerification": { "type": "boolean" },
+      "stt": {
+        "type": "object",
+        "properties": {
+          "provider": { "type": "string", "enum": ["openai"] },
+          "model": { "type": "string" }
+        }
+      },
+      "store": { "type": "string" },
+      "responseModel": { "type": "string" },
+      "responseSystemPrompt": { "type": "string" },
+      "responseTimeoutMs": { "type": "integer", "minimum": 1 }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@genosos/realtime-call",
+  "version": "2026.3.6",
+  "description": "GenosOS realtime-call plugin — bidirectional voice via OpenAI Realtime API",
+  "type": "module",
+  "dependencies": {
+    "@sinclair/typebox": "0.34.48",
+    "ws": "^8.19.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "genosos": "workspace:*"
+  },
+  "genosos": {
+    "extensions": [
+      "./index.js"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@genosos/google-gemini-cli-auth",
+  "version": "2026.2.18",
+  "private": true,
+  "description": "GenosOS Gemini CLI OAuth provider plugin",
+  "type": "module",
+  "devDependencies": {
+    "genosos": "workspace:*"
+  },
+  "genosos": {
+    "extensions": [
+      "./index.js"
+    ]
+  }
+}

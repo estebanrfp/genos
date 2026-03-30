@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support
+    url: https://github.com/estebanrfp/genos/discussions
+    about: Get help from the community in GitHub Discussions.

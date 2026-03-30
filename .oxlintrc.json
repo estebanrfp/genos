@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "oxc"],
+  "categories": {
+    "correctness": "error",
+    "perf": "error",
+    "suspicious": "error"
+  },
+  "rules": {
+    "curly": "error",
+    "eslint-plugin-unicorn/prefer-array-find": "off",
+    "eslint/no-await-in-loop": "off",
+    "eslint/no-new": "off",
+    "eslint/no-shadow": "off",
+    "eslint/no-unmodified-loop-condition": "off",
+    "oxc/no-accumulating-spread": "off",
+    "oxc/no-async-endpoint-handlers": "off",
+    "oxc/no-map-spread": "off",
+    "eslint/no-class-assign": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "unicorn/require-post-message-target-origin": "off"
+  },
+  "ignorePatterns": [
+    "assets/",
+    "dist/",
+    "docs/_layouts/",
+    "extensions/",
+    "extensions-archive/",
+    "node_modules/",
+    "patches/",
+    "pnpm-lock.yaml",
+    "skills/",
+    "src/auto-reply/reply/export-html/template.js",
+    "Swabble/",
+    "vendor/"
+  ]
+}

@@ -1,0 +1,25 @@
+export const TAILSCALE_EXPOSURE_OPTIONS = [
+  { value: "off", label: "Off", hint: "No Tailscale exposure" },
+  {
+    value: "serve",
+    label: "Serve",
+    hint: "Private HTTPS for your tailnet (devices on Tailscale)",
+  },
+  {
+    value: "funnel",
+    label: "Funnel",
+    hint: "Public HTTPS via Tailscale Funnel (internet)",
+  },
+];
+export const TAILSCALE_MISSING_BIN_NOTE_LINES = [
+  "Tailscale binary not found in PATH or /Applications.",
+  "Ensure Tailscale is installed from:",
+  "  https://tailscale.com/download/mac",
+  "",
+  "You can continue setup, but serve/funnel will fail at runtime.",
+];
+export const TAILSCALE_DOCS_LINES = [
+  "Docs:",
+  "https://docs.genos.ai/gateway/tailscale",
+  "https://docs.genos.ai/web",
+];

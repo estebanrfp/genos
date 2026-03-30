@@ -1,0 +1,42 @@
+import crypto from "node:crypto";
+import { requestJsonlSocket } from "./jsonl-socket.js";
+export async function requestExecHostViaSocket(params) {
+  const { socketPath, token, request } = params;
+  if (!socketPath || !token) {
+    return null;
+  }
+  const timeoutMs = params.timeoutMs ?? 20000;
+  const requestJson = JSON.stringify(request);
+  const nonce = crypto.randomBytes(16).toString("hex");
+  const ts = Date.now();
+  const hmac = crypto
+    .createHmac("sha256", token)
+    .update(`${nonce}:${ts}:${requestJson}`)
+    .digest("hex");
+  const payload = JSON.stringify({
+    type: "exec",
+    id: crypto.randomUUID(),
+    nonce,
+    ts,
+    hmac,
+    requestJson,
+  });
+  return await requestJsonlSocket({
+    socketPath,
+    payload,
+    timeoutMs,
+    accept: (value) => {
+      const msg = value;
+      if (msg?.type !== "exec-res") {
+        return;
+      }
+      if (msg.ok === true && msg.payload) {
+        return { ok: true, payload: msg.payload };
+      }
+      if (msg.ok === false && msg.error) {
+        return { ok: false, error: msg.error };
+      }
+      return null;
+    },
+  });
+}

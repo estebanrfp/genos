@@ -1,0 +1,39 @@
+let parseBlocksJson = function (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      throw new Error("blocks must be valid JSON");
+    }
+  },
+  assertBlocksArray = function (raw) {
+    if (!Array.isArray(raw)) {
+      throw new Error("blocks must be an array");
+    }
+    if (raw.length === 0) {
+      throw new Error("blocks must contain at least one block");
+    }
+    if (raw.length > SLACK_MAX_BLOCKS) {
+      throw new Error(`blocks cannot exceed ${SLACK_MAX_BLOCKS} items`);
+    }
+    for (const block of raw) {
+      if (!block || typeof block !== "object" || Array.isArray(block)) {
+        throw new Error("each block must be an object");
+      }
+      const type = block.type;
+      if (typeof type !== "string" || type.trim().length === 0) {
+        throw new Error("each block must include a non-empty string type");
+      }
+    }
+  };
+const SLACK_MAX_BLOCKS = 50;
+export function validateSlackBlocksArray(raw) {
+  assertBlocksArray(raw);
+  return raw;
+}
+export function parseSlackBlocksInput(raw) {
+  if (raw == null) {
+    return;
+  }
+  const parsed = typeof raw === "string" ? parseBlocksJson(raw) : raw;
+  return validateSlackBlocksArray(parsed);
+}

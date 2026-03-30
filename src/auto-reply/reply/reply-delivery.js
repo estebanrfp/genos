@@ -1,0 +1,91 @@
+import { logVerbose } from "../../globals.js";
+import { SILENT_REPLY_TOKEN } from "../tokens.js";
+import { createBlockReplyPayloadKey } from "./block-reply-pipeline.js";
+import { parseReplyDirectives } from "./reply-directives.js";
+import { applyReplyTagsToPayload, isRenderablePayload } from "./reply-payloads.js";
+export function normalizeReplyPayloadDirectives(params) {
+  const parseMode = params.parseMode ?? "always";
+  const silentToken = params.silentToken ?? SILENT_REPLY_TOKEN;
+  const sourceText = params.payload.text ?? "";
+  const shouldParse =
+    parseMode === "always" ||
+    (parseMode === "auto" &&
+      (sourceText.includes("[[") ||
+        sourceText.includes("MEDIA:") ||
+        sourceText.includes(silentToken)));
+  const parsed = shouldParse
+    ? parseReplyDirectives(sourceText, {
+        currentMessageId: params.currentMessageId,
+        silentToken,
+      })
+    : undefined;
+  let text = parsed ? parsed.text || undefined : params.payload.text || undefined;
+  if (params.trimLeadingWhitespace && text) {
+    text = text.trimStart() || undefined;
+  }
+  const mediaUrls = params.payload.mediaUrls ?? parsed?.mediaUrls;
+  const mediaUrl = params.payload.mediaUrl ?? parsed?.mediaUrl ?? mediaUrls?.[0];
+  return {
+    payload: {
+      ...params.payload,
+      text,
+      mediaUrls,
+      mediaUrl,
+      replyToId: params.payload.replyToId ?? parsed?.replyToId,
+      replyToTag: params.payload.replyToTag || parsed?.replyToTag,
+      replyToCurrent: params.payload.replyToCurrent || parsed?.replyToCurrent,
+      audioAsVoice: Boolean(params.payload.audioAsVoice || parsed?.audioAsVoice),
+    },
+    isSilent: parsed?.isSilent ?? false,
+  };
+}
+const hasRenderableMedia = (payload) =>
+  Boolean(payload.mediaUrl) || (payload.mediaUrls?.length ?? 0) > 0;
+export function createBlockReplyDeliveryHandler(params) {
+  return async (payload) => {
+    const { text, skip } = params.normalizeStreamingText(payload);
+    if (skip && !hasRenderableMedia(payload)) {
+      return;
+    }
+    const taggedPayload = applyReplyTagsToPayload(
+      {
+        ...payload,
+        text,
+        mediaUrl: payload.mediaUrl ?? payload.mediaUrls?.[0],
+        replyToId:
+          payload.replyToId ??
+          (payload.replyToCurrent === false ? undefined : params.currentMessageId),
+      },
+      params.currentMessageId,
+    );
+    if (!isRenderablePayload(taggedPayload) && !payload.audioAsVoice) {
+      return;
+    }
+    const normalized = normalizeReplyPayloadDirectives({
+      payload: taggedPayload,
+      currentMessageId: params.currentMessageId,
+      silentToken: SILENT_REPLY_TOKEN,
+      trimLeadingWhitespace: true,
+      parseMode: "auto",
+    });
+    const blockPayload = params.applyReplyToMode(normalized.payload);
+    const blockHasMedia = hasRenderableMedia(blockPayload);
+    if (!blockPayload.text && !blockHasMedia && !blockPayload.audioAsVoice) {
+      return;
+    }
+    if (normalized.isSilent && !blockHasMedia) {
+      return;
+    }
+    if (blockPayload.text) {
+      params.typingSignals.signalTextDelta(blockPayload.text).catch((err) => {
+        logVerbose(`block reply typing signal failed: ${String(err)}`);
+      });
+    }
+    if (params.blockStreamingEnabled && params.blockReplyPipeline) {
+      params.blockReplyPipeline.enqueue(blockPayload);
+    } else if (params.blockStreamingEnabled) {
+      params.directlySentBlockKeys.add(createBlockReplyPayloadKey(blockPayload));
+      await params.onBlockReply(blockPayload);
+    }
+  };
+}
