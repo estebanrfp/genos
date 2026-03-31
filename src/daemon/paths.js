@@ -34,5 +34,5 @@ export function resolveGatewayStateDir(env) {
   }
   const home = resolveHomeDir(env);
   const suffix = resolveGatewayProfileSuffix(env.GENOS_PROFILE);
-  return path.join(home, `.genos${suffix}`);
+  return path.join(home, suffix ? `.genos${suffix}` : ".genosv1");
 }
