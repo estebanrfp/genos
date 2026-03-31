@@ -136,7 +136,7 @@ describe("runCronIsolatedAgentTurn", () => {
       expect(res.status).toBe("ok");
       expect(runSubagentAnnounceFlow).toHaveBeenCalledTimes(1);
       const announceArgs = vi.mocked(runSubagentAnnounceFlow).mock.calls[0]?.[0];
-      expect(announceArgs?.requesterSessionKey).toBe("agent:main:telegram:direct:123");
+      expect(announceArgs?.requesterSessionKey).toBe("agent:default:telegram:direct:123");
       expect(announceArgs?.requesterOrigin?.channel).toBe("telegram");
       expect(announceArgs?.requesterOrigin?.to).toBe("123");
     });
@@ -148,7 +148,7 @@ describe("runCronIsolatedAgentTurn", () => {
         storePath,
         JSON.stringify(
           {
-            "agent:main:main": {
+            "agent:default:main": {
               sessionId: "main-session",
               updatedAt: Date.now(),
               lastChannel: "telegram",

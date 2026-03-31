@@ -142,7 +142,7 @@ describe("sessions_send label lookup", () => {
     const details = result.details;
     expect(details.status).toBe("ok");
     expect(details.reply).toBe("labeled response");
-    expect(details.sessionKey).toBe("agent:main:test-labeled-session");
+    expect(details.sessionKey).toBe("agent:default:test-labeled-session");
   });
   it("returns error when label not found", { timeout: 60000 }, async () => {
     const tool = createGenosOSTools().find((candidate) => candidate.name === "sessions_send");

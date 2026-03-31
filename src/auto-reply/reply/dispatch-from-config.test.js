@@ -356,7 +356,7 @@ describe("dispatchReplyFromConfig", () => {
     const ctx = buildTestCtx({
       Provider: "telegram",
       Surface: "telegram",
-      SessionKey: "agent:main:main",
+      SessionKey: "agent:default:main",
       CommandBody: "/help",
       MessageSid: "msg-42",
     });
@@ -365,7 +365,7 @@ describe("dispatchReplyFromConfig", () => {
     expect(internalHookMocks.createInternalHookEvent).toHaveBeenCalledWith(
       "message",
       "received",
-      "agent:main:main",
+      "agent:default:main",
       expect.objectContaining({
         from: ctx.From,
         content: "/help",
@@ -397,7 +397,7 @@ describe("dispatchReplyFromConfig", () => {
     const ctx = buildTestCtx({
       Provider: "slack",
       Surface: "slack",
-      SessionKey: "agent:main:main",
+      SessionKey: "agent:default:main",
       MessageSid: "msg-1",
       To: "slack:C123",
     });
@@ -405,7 +405,7 @@ describe("dispatchReplyFromConfig", () => {
     await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
     expect(diagnosticMocks.logMessageQueued).toHaveBeenCalledTimes(1);
     expect(diagnosticMocks.logSessionStateChange).toHaveBeenCalledWith({
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       state: "processing",
       reason: "message_start",
     });
@@ -413,7 +413,7 @@ describe("dispatchReplyFromConfig", () => {
       expect.objectContaining({
         channel: "slack",
         outcome: "completed",
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
       }),
     );
   });

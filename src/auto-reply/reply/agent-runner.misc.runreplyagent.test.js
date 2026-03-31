@@ -990,7 +990,7 @@ describe("runReplyAgent response usage footer", () => {
         },
       },
     });
-    const sessionKey = "agent:main:whatsapp:dm:+1000";
+    const sessionKey = "agent:default:whatsapp:dm:+1000";
     const res = await createRun({ responseUsage: "full", sessionKey });
     const payload = Array.isArray(res) ? res[0] : res;
     expect(String(payload?.text ?? "")).toContain("Usage:");
@@ -1007,7 +1007,7 @@ describe("runReplyAgent response usage footer", () => {
         },
       },
     });
-    const sessionKey = "agent:main:whatsapp:dm:+1000";
+    const sessionKey = "agent:default:whatsapp:dm:+1000";
     const res = await createRun({ responseUsage: "tokens", sessionKey });
     const payload = Array.isArray(res) ? res[0] : res;
     expect(String(payload?.text ?? "")).toContain("Usage:");

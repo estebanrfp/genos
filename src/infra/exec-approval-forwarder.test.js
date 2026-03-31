@@ -19,7 +19,7 @@ const baseRequest = {
   request: {
     command: "echo hello",
     agentId: "main",
-    sessionKey: "agent:main:main",
+    sessionKey: "agent:default:main",
   },
   createdAtMs: 1000,
   expiresAtMs: 6000,

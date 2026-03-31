@@ -24,7 +24,7 @@ describe("gateway ws log helpers", () => {
   test("summarizeAgentEventForWsLog extracts useful fields", () => {
     const summary = summarizeAgentEventForWsLog({
       runId: "12345678-1234-1234-1234-123456789abc",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       stream: "assistant",
       seq: 2,
       data: { text: "hello world", mediaUrls: ["a", "b"] },

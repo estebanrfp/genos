@@ -46,13 +46,13 @@ describe("subagent registry steer restarts", () => {
   it("suppresses announce for interrupted runs and only announces the replacement run", async () => {
     mod.registerSubagentRun({
       runId: "run-old",
-      childSessionKey: "agent:main:subagent:steer",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:steer",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "initial task",
       cleanup: "keep",
     });
-    const previous = mod.listSubagentRunsForRequester("agent:main:main")[0];
+    const previous = mod.listSubagentRunsForRequester("agent:default:main")[0];
     expect(previous?.runId).toBe("run-old");
     const marked = mod.markSubagentRunForSteerRestart("run-old");
     expect(marked).toBe(true);
@@ -69,7 +69,7 @@ describe("subagent registry steer restarts", () => {
       fallback: previous,
     });
     expect(replaced).toBe(true);
-    const runs = mod.listSubagentRunsForRequester("agent:main:main");
+    const runs = mod.listSubagentRunsForRequester("agent:default:main");
     expect(runs).toHaveLength(1);
     expect(runs[0].runId).toBe("run-new");
     lifecycleHandler?.({
@@ -85,13 +85,13 @@ describe("subagent registry steer restarts", () => {
   it("clears announce retry state when replacing after steer restart", () => {
     mod.registerSubagentRun({
       runId: "run-retry-reset-old",
-      childSessionKey: "agent:main:subagent:retry-reset",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:retry-reset",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "retry reset",
       cleanup: "keep",
     });
-    const previous = mod.listSubagentRunsForRequester("agent:main:main")[0];
+    const previous = mod.listSubagentRunsForRequester("agent:default:main")[0];
     expect(previous?.runId).toBe("run-retry-reset-old");
     if (previous) {
       previous.announceRetryCount = 2;
@@ -103,7 +103,7 @@ describe("subagent registry steer restarts", () => {
       fallback: previous,
     });
     expect(replaced).toBe(true);
-    const runs = mod.listSubagentRunsForRequester("agent:main:main");
+    const runs = mod.listSubagentRunsForRequester("agent:default:main");
     expect(runs).toHaveLength(1);
     expect(runs[0].runId).toBe("run-retry-reset-new");
     expect(runs[0].announceRetryCount).toBeUndefined();
@@ -112,8 +112,8 @@ describe("subagent registry steer restarts", () => {
   it("restores announce for a finished run when steer replacement dispatch fails", async () => {
     mod.registerSubagentRun({
       runId: "run-failed-restart",
-      childSessionKey: "agent:main:subagent:failed-restart",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:failed-restart",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "initial task",
       cleanup: "keep",
@@ -133,11 +133,11 @@ describe("subagent registry steer restarts", () => {
     expect(announce.childRunId).toBe("run-failed-restart");
   });
   it("marks killed runs terminated and inactive", async () => {
-    const childSessionKey = "agent:main:subagent:killed";
+    const childSessionKey = "agent:default:subagent:killed";
     mod.registerSubagentRun({
       runId: "run-killed",
       childSessionKey,
-      requesterSessionKey: "agent:main:main",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "kill me",
       cleanup: "keep",
@@ -149,7 +149,7 @@ describe("subagent registry steer restarts", () => {
     });
     expect(updated).toBe(1);
     expect(mod.isSubagentSessionRunActive(childSessionKey)).toBe(false);
-    const run = mod.listSubagentRunsForRequester("agent:main:main")[0];
+    const run = mod.listSubagentRunsForRequester("agent:default:main")[0];
     expect(run?.outcome).toEqual({ status: "error", error: "manual kill" });
     expect(run?.cleanupHandled).toBe(true);
     expect(typeof run?.cleanupCompletedAt).toBe("number");
@@ -166,16 +166,16 @@ describe("subagent registry steer restarts", () => {
     });
     mod.registerSubagentRun({
       runId: "run-parent",
-      childSessionKey: "agent:main:subagent:parent",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:parent",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "parent task",
       cleanup: "keep",
     });
     mod.registerSubagentRun({
       runId: "run-child",
-      childSessionKey: "agent:main:subagent:parent:subagent:child",
-      requesterSessionKey: "agent:main:subagent:parent",
+      childSessionKey: "agent:default:subagent:parent:subagent:child",
+      requesterSessionKey: "agent:default:subagent:parent",
       requesterDisplayKey: "parent",
       task: "child task",
       cleanup: "keep",
@@ -216,8 +216,8 @@ describe("subagent registry steer restarts", () => {
       announceSpy.mockResolvedValue(false);
       mod.registerSubagentRun({
         runId: "run-completion-retry",
-        childSessionKey: "agent:main:subagent:completion",
-        requesterSessionKey: "agent:main:main",
+        childSessionKey: "agent:default:subagent:completion",
+        requesterSessionKey: "agent:default:main",
         requesterDisplayKey: "main",
         task: "completion retry",
         cleanup: "keep",
@@ -230,20 +230,20 @@ describe("subagent registry steer restarts", () => {
       });
       await vi.advanceTimersByTimeAsync(0);
       expect(announceSpy).toHaveBeenCalledTimes(1);
-      expect(mod.listSubagentRunsForRequester("agent:main:main")[0]?.announceRetryCount).toBe(1);
+      expect(mod.listSubagentRunsForRequester("agent:default:main")[0]?.announceRetryCount).toBe(1);
       await vi.advanceTimersByTimeAsync(999);
       expect(announceSpy).toHaveBeenCalledTimes(1);
       await vi.advanceTimersByTimeAsync(1);
       expect(announceSpy).toHaveBeenCalledTimes(2);
-      expect(mod.listSubagentRunsForRequester("agent:main:main")[0]?.announceRetryCount).toBe(2);
+      expect(mod.listSubagentRunsForRequester("agent:default:main")[0]?.announceRetryCount).toBe(2);
       await vi.advanceTimersByTimeAsync(1999);
       expect(announceSpy).toHaveBeenCalledTimes(2);
       await vi.advanceTimersByTimeAsync(1);
       expect(announceSpy).toHaveBeenCalledTimes(3);
-      expect(mod.listSubagentRunsForRequester("agent:main:main")[0]?.announceRetryCount).toBe(3);
+      expect(mod.listSubagentRunsForRequester("agent:default:main")[0]?.announceRetryCount).toBe(3);
       await vi.advanceTimersByTimeAsync(4001);
       expect(announceSpy).toHaveBeenCalledTimes(3);
-      expect(mod.listSubagentRunsForRequester("agent:main:main")[0]?.cleanupCompletedAt).toBeTypeOf(
+      expect(mod.listSubagentRunsForRequester("agent:default:main")[0]?.cleanupCompletedAt).toBeTypeOf(
         "number",
       );
     } finally {

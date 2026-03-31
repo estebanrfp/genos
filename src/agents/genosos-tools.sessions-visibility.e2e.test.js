@@ -59,7 +59,7 @@ describe("sessions tools visibility", () => {
     });
     const tool = getSessionsHistoryTool();
     const denied = await tool.execute("call1", {
-      sessionKey: "agent:main:discord:direct:someone-else",
+      sessionKey: "agent:default:discord:direct:someone-else",
     });
     expect(denied.details).toMatchObject({ status: "forbidden" });
     const allowed = await tool.execute("call2", { sessionKey: "subagent:child-1" });
@@ -75,10 +75,10 @@ describe("sessions tools visibility", () => {
     mockGatewayWithHistory();
     const tool = getSessionsHistoryTool();
     const result = await tool.execute("call3", {
-      sessionKey: "agent:main:discord:direct:someone-else",
+      sessionKey: "agent:default:discord:direct:someone-else",
     });
     expect(result.details).toMatchObject({
-      sessionKey: "agent:main:discord:direct:someone-else",
+      sessionKey: "agent:default:discord:direct:someone-else",
     });
   });
   it("clamps sandboxed sessions to tree when agents.defaults.sandbox.sessionToolsVisibility=spawned", async () => {

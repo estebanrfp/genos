@@ -39,7 +39,7 @@ describe("Agent-specific tool filtering", () => {
       };
       const tools = createGenosOSCodingTools({
         config: cfg,
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         workspaceDir,
         agentDir: "/tmp/agent",
         modelProvider: "openai",
@@ -80,7 +80,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test",
       agentDir: "/tmp/agent",
     });
@@ -112,7 +112,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test",
       agentDir: "/tmp/agent",
     });
@@ -133,7 +133,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test",
       agentDir: "/tmp/agent",
       modelProvider: "openai",
@@ -207,7 +207,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test-provider",
       agentDir: "/tmp/agent-provider",
       modelProvider: "google-antigravity",
@@ -232,7 +232,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test-provider-profile",
       agentDir: "/tmp/agent-provider-profile",
       modelProvider: "google-antigravity",
@@ -262,7 +262,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const mainTools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test-main",
       agentDir: "/tmp/agent-main",
     });
@@ -301,7 +301,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const trustedTools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:whatsapp:group:trusted",
+      sessionKey: "agent:default:whatsapp:group:trusted",
       messageProvider: "whatsapp",
       workspaceDir: "/tmp/test-group-trusted",
       agentDir: "/tmp/agent-group",
@@ -311,7 +311,7 @@ describe("Agent-specific tool filtering", () => {
     expect(trustedNames).toContain("exec");
     const defaultTools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:whatsapp:group:unknown",
+      sessionKey: "agent:default:whatsapp:group:unknown",
       messageProvider: "whatsapp",
       workspaceDir: "/tmp/test-group-default",
       agentDir: "/tmp/agent-group",
@@ -337,7 +337,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const aliceTools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:whatsapp:group:family",
+      sessionKey: "agent:default:whatsapp:group:family",
       senderId: "alice",
       workspaceDir: "/tmp/test-group-sender",
       agentDir: "/tmp/agent-group-sender",
@@ -347,7 +347,7 @@ describe("Agent-specific tool filtering", () => {
     expect(aliceNames).toContain("exec");
     const bobTools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:whatsapp:group:family",
+      sessionKey: "agent:default:whatsapp:group:family",
       senderId: "bob",
       workspaceDir: "/tmp/test-group-sender-bob",
       agentDir: "/tmp/agent-group-sender",
@@ -375,7 +375,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const adminTools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:whatsapp:group:locked",
+      sessionKey: "agent:default:whatsapp:group:locked",
       senderId: "admin",
       workspaceDir: "/tmp/test-group-default-override",
       agentDir: "/tmp/agent-group-default-override",
@@ -398,7 +398,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:telegram:group:123:topic:456",
+      sessionKey: "agent:default:telegram:group:123:topic:456",
       messageProvider: "telegram",
       workspaceDir: "/tmp/test-telegram-topic",
       agentDir: "/tmp/agent-telegram",
@@ -421,8 +421,8 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:subagent:test",
-      spawnedBy: "agent:main:whatsapp:group:trusted",
+      sessionKey: "agent:default:subagent:test",
+      spawnedBy: "agent:default:whatsapp:group:trusted",
       workspaceDir: "/tmp/test-subagent-group",
       agentDir: "/tmp/agent-subagent",
     });
@@ -535,7 +535,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test-main",
       agentDir: "/tmp/agent-main",
     });
@@ -573,7 +573,7 @@ describe("Agent-specific tool filtering", () => {
     };
     const mainTools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: "/tmp/test-main-exec-defaults",
       agentDir: "/tmp/agent-main-exec-defaults",
     });

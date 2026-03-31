@@ -51,12 +51,12 @@ describe("sandbox session-tools context", () => {
     };
     const context = resolveSandboxedSessionToolContext({
       cfg,
-      agentSessionKey: "agent:main:main",
+      agentSessionKey: "agent:default:main",
       sandboxed: true,
     });
     expect(context.restrictToSpawned).toBe(true);
-    expect(context.requesterInternalKey).toBe("agent:main:main");
-    expect(context.effectiveRequesterKey).toBe("agent:main:main");
+    expect(context.requesterInternalKey).toBe("agent:default:main");
+    expect(context.effectiveRequesterKey).toBe("agent:default:main");
   });
   it("does not restrict subagent sessions in sandboxed mode", () => {
     const cfg = {
@@ -65,11 +65,11 @@ describe("sandbox session-tools context", () => {
     };
     const context = resolveSandboxedSessionToolContext({
       cfg,
-      agentSessionKey: "agent:main:subagent:abc",
+      agentSessionKey: "agent:default:subagent:abc",
       sandboxed: true,
     });
     expect(context.restrictToSpawned).toBe(false);
-    expect(context.requesterInternalKey).toBe("agent:main:subagent:abc");
+    expect(context.requesterInternalKey).toBe("agent:default:subagent:abc");
   });
 });
 describe("createAgentToAgentPolicy", () => {
@@ -103,7 +103,7 @@ describe("createSessionVisibilityGuard", () => {
   it("allows cross-agent send with tree visibility when A2A is enabled", async () => {
     const guard = await createSessionVisibilityGuard({
       action: "send",
-      requesterSessionKey: "agent:main:main",
+      requesterSessionKey: "agent:default:main",
       visibility: "tree",
       a2aPolicy: createAgentToAgentPolicy({}),
     });
@@ -112,7 +112,7 @@ describe("createSessionVisibilityGuard", () => {
   it("blocks cross-agent send when agent-to-agent is explicitly disabled", async () => {
     const guard = await createSessionVisibilityGuard({
       action: "send",
-      requesterSessionKey: "agent:main:main",
+      requesterSessionKey: "agent:default:main",
       visibility: "all",
       a2aPolicy: createAgentToAgentPolicy({ tools: { agentToAgent: { enabled: false } } }),
     });
@@ -126,12 +126,12 @@ describe("createSessionVisibilityGuard", () => {
   it("enforces self visibility for same-agent sessions", async () => {
     const guard = await createSessionVisibilityGuard({
       action: "history",
-      requesterSessionKey: "agent:main:main",
+      requesterSessionKey: "agent:default:main",
       visibility: "self",
       a2aPolicy: createAgentToAgentPolicy({}),
     });
-    expect(guard.check("agent:main:main")).toEqual({ allowed: true });
-    expect(guard.check("agent:main:telegram:group:1")).toEqual({
+    expect(guard.check("agent:default:main")).toEqual({ allowed: true });
+    expect(guard.check("agent:default:telegram:group:1")).toEqual({
       allowed: false,
       status: "forbidden",
       error:

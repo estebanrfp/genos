@@ -58,7 +58,7 @@ describe("abort detection", () => {
       Body: `[Context]\nJake: /stop\n[from: Jake]`,
       RawBody: "/stop",
       ChatType: "group",
-      SessionKey: "agent:main:whatsapp:group:g1",
+      SessionKey: "agent:default:whatsapp:group:g1",
     };
     const result = await initSessionState({
       ctx: groupMessageCtx,
@@ -183,7 +183,7 @@ describe("abort detection", () => {
     const storePath = path.join(root, "sessions.json");
     const cfg = { session: { store: storePath } };
     const sessionKey = "telegram:parent";
-    const childKey = "agent:main:subagent:child-1";
+    const childKey = "agent:default:subagent:child-1";
     const sessionId = "session-parent";
     const childSessionId = "session-child";
     await fs.writeFile(
@@ -228,8 +228,8 @@ describe("abort detection", () => {
     const storePath = path.join(root, "sessions.json");
     const cfg = { session: { store: storePath } };
     const sessionKey = "telegram:parent";
-    const depth1Key = "agent:main:subagent:child-1";
-    const depth2Key = "agent:main:subagent:child-1:subagent:grandchild-1";
+    const depth1Key = "agent:default:subagent:child-1";
+    const depth2Key = "agent:default:subagent:child-1:subagent:grandchild-1";
     const sessionId = "session-parent";
     const depth1SessionId = "session-child";
     const depth2SessionId = "session-grandchild";
@@ -295,8 +295,8 @@ describe("abort detection", () => {
     const storePath = path.join(root, "sessions.json");
     const cfg = { session: { store: storePath } };
     const sessionKey = "telegram:parent";
-    const depth1Key = "agent:main:subagent:child-ended";
-    const depth2Key = "agent:main:subagent:child-ended:subagent:grandchild-active";
+    const depth1Key = "agent:default:subagent:child-ended";
+    const depth2Key = "agent:default:subagent:child-ended:subagent:grandchild-active";
     const now = Date.now();
     await fs.writeFile(
       storePath,

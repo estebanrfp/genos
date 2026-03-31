@@ -45,7 +45,7 @@ describe("subagent registry persistence", () => {
         [params.runId]: {
           runId: params.runId,
           childSessionKey: params.childSessionKey,
-          requesterSessionKey: "agent:main:main",
+          requesterSessionKey: "agent:default:main",
           requesterDisplayKey: "main",
           task: params.task,
           cleanup: params.cleanup,
@@ -79,8 +79,8 @@ describe("subagent registry persistence", () => {
     process.env.GENOS_STATE_DIR = tempStateDir;
     registerSubagentRun({
       runId: "run-1",
-      childSessionKey: "agent:main:subagent:test",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:test",
+      requesterSessionKey: "agent:default:main",
       requesterOrigin: { channel: " whatsapp ", accountId: " acct-main " },
       requesterDisplayKey: "main",
       task: "do the thing",
@@ -106,7 +106,7 @@ describe("subagent registry persistence", () => {
     if (!first) {
       throw new Error("expected announce call");
     }
-    expect(first.childSessionKey).toBe("agent:main:subagent:test");
+    expect(first.childSessionKey).toBe("agent:default:subagent:test");
     expect(first.requesterOrigin?.channel).toBe("whatsapp");
     expect(first.requesterOrigin?.accountId).toBe("acct-main");
   });
@@ -119,8 +119,8 @@ describe("subagent registry persistence", () => {
       runs: {
         "run-2": {
           runId: "run-2",
-          childSessionKey: "agent:main:subagent:two",
-          requesterSessionKey: "agent:main:main",
+          childSessionKey: "agent:default:subagent:two",
+          requesterSessionKey: "agent:default:main",
           requesterDisplayKey: "main",
           task: "do the other thing",
           cleanup: "keep",
@@ -137,7 +137,7 @@ describe("subagent registry persistence", () => {
     initSubagentRegistry();
     await flushQueuedRegistryWork();
     const calls = announceSpy.mock.calls.map((call) => call[0]);
-    const match = calls.find((params) => params.childSessionKey === "agent:main:subagent:two");
+    const match = calls.find((params) => params.childSessionKey === "agent:default:subagent:two");
     expect(match).toBeFalsy();
   });
   it("maps legacy announce fields into cleanup state", async () => {
@@ -146,8 +146,8 @@ describe("subagent registry persistence", () => {
       runs: {
         "run-legacy": {
           runId: "run-legacy",
-          childSessionKey: "agent:main:subagent:legacy",
-          requesterSessionKey: "agent:main:main",
+          childSessionKey: "agent:default:subagent:legacy",
+          requesterSessionKey: "agent:default:main",
           requesterDisplayKey: "main",
           task: "legacy announce",
           cleanup: "keep",
@@ -174,7 +174,7 @@ describe("subagent registry persistence", () => {
   it("retries cleanup announce after a failed announce", async () => {
     const persisted = createPersistedEndedRun({
       runId: "run-3",
-      childSessionKey: "agent:main:subagent:three",
+      childSessionKey: "agent:default:subagent:three",
       task: "retry announce",
       cleanup: "keep",
     });
@@ -194,7 +194,7 @@ describe("subagent registry persistence", () => {
   it("keeps delete-mode runs retryable when announce is deferred", async () => {
     const persisted = createPersistedEndedRun({
       runId: "run-4",
-      childSessionKey: "agent:main:subagent:four",
+      childSessionKey: "agent:default:subagent:four",
       task: "deferred announce",
       cleanup: "delete",
     });

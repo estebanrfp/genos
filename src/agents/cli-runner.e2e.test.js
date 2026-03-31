@@ -142,7 +142,7 @@ describe("runCliAgent with process supervisor", () => {
     try {
       await runCliAgent({
         sessionId: "s1",
-        sessionKey: "agent:main:subagent:missing-workspace",
+        sessionKey: "agent:default:subagent:missing-workspace",
         sessionFile: "/tmp/session.jsonl",
         workspaceDir: undefined,
         config: cfg,

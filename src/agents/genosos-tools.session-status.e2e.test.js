@@ -115,7 +115,7 @@ describe("session_status tool", () => {
   it("resolves sessionId inputs", async () => {
     const sessionId = "sess-main";
     resetSessionStore({
-      "agent:main:main": {
+      "agent:default:main": {
         sessionId,
         updatedAt: 10,
       },
@@ -124,7 +124,7 @@ describe("session_status tool", () => {
     const result = await tool.execute("call3", { sessionKey: sessionId });
     const details = result.details;
     expect(details.ok).toBe(true);
-    expect(details.sessionKey).toBe("agent:main:main");
+    expect(details.sessionKey).toBe("agent:default:main");
   });
   it("uses non-standard session keys without sessionId resolution", async () => {
     resetSessionStore({
@@ -146,7 +146,7 @@ describe("session_status tool", () => {
         updatedAt: 10,
       },
     });
-    const tool = getSessionStatusTool("agent:main:main");
+    const tool = getSessionStatusTool("agent:default:main");
     await expect(tool.execute("call5", { sessionKey: "agent:other:main" })).rejects.toThrow(
       "Agent-to-agent status is disabled",
     );
@@ -158,7 +158,7 @@ describe("session_status tool", () => {
       [
         "/tmp/main/sessions.json",
         {
-          "agent:main:main": { sessionId: "s-main", updatedAt: 10 },
+          "agent:default:main": { sessionId: "s-main", updatedAt: 10 },
         },
       ],
       [

@@ -33,8 +33,8 @@ describe("subagent registry nested agent tracking", () => {
       await import("./subagent-registry.js");
     registerSubagentRun({
       runId: "run-orch",
-      childSessionKey: "agent:main:subagent:orch-uuid",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:orch-uuid",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "orchestrate something",
       cleanup: "keep",
@@ -42,21 +42,21 @@ describe("subagent registry nested agent tracking", () => {
     });
     registerSubagentRun({
       runId: "run-leaf",
-      childSessionKey: "agent:main:subagent:orch-uuid:subagent:leaf-uuid",
-      requesterSessionKey: "agent:main:subagent:orch-uuid",
+      childSessionKey: "agent:default:subagent:orch-uuid:subagent:leaf-uuid",
+      requesterSessionKey: "agent:default:subagent:orch-uuid",
       requesterDisplayKey: "subagent:orch-uuid",
       task: "do leaf work",
       cleanup: "keep",
       label: "leaf",
     });
-    const mainRuns = listSubagentRunsForRequester("agent:main:main");
+    const mainRuns = listSubagentRunsForRequester("agent:default:main");
     expect(mainRuns).toHaveLength(1);
     expect(mainRuns[0].runId).toBe("run-orch");
-    const orchRuns = listSubagentRunsForRequester("agent:main:subagent:orch-uuid");
+    const orchRuns = listSubagentRunsForRequester("agent:default:subagent:orch-uuid");
     expect(orchRuns).toHaveLength(1);
     expect(orchRuns[0].runId).toBe("run-leaf");
     const leafRuns = listSubagentRunsForRequester(
-      "agent:main:subagent:orch-uuid:subagent:leaf-uuid",
+      "agent:default:subagent:orch-uuid:subagent:leaf-uuid",
     );
     expect(leafRuns).toHaveLength(0);
   });
@@ -64,56 +64,56 @@ describe("subagent registry nested agent tracking", () => {
     const { registerSubagentRun } = await import("./subagent-registry.js");
     registerSubagentRun({
       runId: "run-subsub",
-      childSessionKey: "agent:main:subagent:orch:subagent:child",
-      requesterSessionKey: "agent:main:subagent:orch",
+      childSessionKey: "agent:default:subagent:orch:subagent:child",
+      requesterSessionKey: "agent:default:subagent:orch",
       requesterDisplayKey: "subagent:orch",
       task: "nested task",
       cleanup: "keep",
       label: "nested-leaf",
     });
     const { listSubagentRunsForRequester } = await import("./subagent-registry.js");
-    const orchRuns = listSubagentRunsForRequester("agent:main:subagent:orch");
+    const orchRuns = listSubagentRunsForRequester("agent:default:subagent:orch");
     expect(orchRuns).toHaveLength(1);
-    expect(orchRuns[0].requesterSessionKey).toBe("agent:main:subagent:orch");
-    expect(orchRuns[0].childSessionKey).toBe("agent:main:subagent:orch:subagent:child");
+    expect(orchRuns[0].requesterSessionKey).toBe("agent:default:subagent:orch");
+    expect(orchRuns[0].childSessionKey).toBe("agent:default:subagent:orch:subagent:child");
   });
   it("countActiveRunsForSession only counts active children of the specific session", async () => {
     const { registerSubagentRun, countActiveRunsForSession } =
       await import("./subagent-registry.js");
     registerSubagentRun({
       runId: "run-orch-active",
-      childSessionKey: "agent:main:subagent:orch1",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:orch1",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "orchestrate",
       cleanup: "keep",
     });
     registerSubagentRun({
       runId: "run-leaf-1",
-      childSessionKey: "agent:main:subagent:orch1:subagent:leaf1",
-      requesterSessionKey: "agent:main:subagent:orch1",
+      childSessionKey: "agent:default:subagent:orch1:subagent:leaf1",
+      requesterSessionKey: "agent:default:subagent:orch1",
       requesterDisplayKey: "subagent:orch1",
       task: "leaf 1",
       cleanup: "keep",
     });
     registerSubagentRun({
       runId: "run-leaf-2",
-      childSessionKey: "agent:main:subagent:orch1:subagent:leaf2",
-      requesterSessionKey: "agent:main:subagent:orch1",
+      childSessionKey: "agent:default:subagent:orch1:subagent:leaf2",
+      requesterSessionKey: "agent:default:subagent:orch1",
       requesterDisplayKey: "subagent:orch1",
       task: "leaf 2",
       cleanup: "keep",
     });
-    expect(countActiveRunsForSession("agent:main:main")).toBe(1);
-    expect(countActiveRunsForSession("agent:main:subagent:orch1")).toBe(2);
+    expect(countActiveRunsForSession("agent:default:main")).toBe(1);
+    expect(countActiveRunsForSession("agent:default:subagent:orch1")).toBe(2);
   });
   it("countActiveDescendantRuns traverses through ended parents", async () => {
     const { addSubagentRunForTests, countActiveDescendantRuns } =
       await import("./subagent-registry.js");
     addSubagentRunForTests({
       runId: "run-parent-ended",
-      childSessionKey: "agent:main:subagent:orch-ended",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:orch-ended",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "orchestrate",
       cleanup: "keep",
@@ -124,8 +124,8 @@ describe("subagent registry nested agent tracking", () => {
     });
     addSubagentRunForTests({
       runId: "run-leaf-active",
-      childSessionKey: "agent:main:subagent:orch-ended:subagent:leaf",
-      requesterSessionKey: "agent:main:subagent:orch-ended",
+      childSessionKey: "agent:default:subagent:orch-ended:subagent:leaf",
+      requesterSessionKey: "agent:default:subagent:orch-ended",
       requesterDisplayKey: "orch-ended",
       task: "leaf",
       cleanup: "keep",
@@ -133,7 +133,7 @@ describe("subagent registry nested agent tracking", () => {
       startedAt: 1,
       cleanupHandled: false,
     });
-    expect(countActiveDescendantRuns("agent:main:main")).toBe(1);
-    expect(countActiveDescendantRuns("agent:main:subagent:orch-ended")).toBe(1);
+    expect(countActiveDescendantRuns("agent:default:main")).toBe(1);
+    expect(countActiveDescendantRuns("agent:default:subagent:orch-ended")).toBe(1);
   });
 });

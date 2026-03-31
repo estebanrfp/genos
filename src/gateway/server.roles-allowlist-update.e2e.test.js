@@ -94,7 +94,7 @@ describe("gateway update.run", () => {
           id,
           method: "update.run",
           params: {
-            sessionKey: "agent:main:whatsapp:dm:+15555550123",
+            sessionKey: "agent:default:whatsapp:dm:+15555550123",
             restartDelayMs: 0,
           },
         }),

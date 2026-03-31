@@ -183,7 +183,7 @@ describe("gateway hooks helpers", () => {
     const denied = resolveHookSessionKey({
       hooksConfig: resolved,
       source: "request",
-      sessionKey: "agent:main:dm:u99999",
+      sessionKey: "agent:default:dm:u99999",
     });
     expect(denied.ok).toBe(false);
   });
@@ -220,7 +220,7 @@ describe("gateway hooks helpers", () => {
     const blocked = resolveHookSessionKey({
       hooksConfig: resolved,
       source: "request",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     expect(blocked.ok).toBe(false);
     const allowed = resolveHookSessionKey({
@@ -255,7 +255,7 @@ describe("gateway hooks helpers", () => {
         hooks: {
           enabled: true,
           token: "secret",
-          defaultSessionKey: "agent:main:main",
+          defaultSessionKey: "agent:default:main",
           allowedSessionKeyPrefixes: ["hook:"],
         },
       }),

@@ -83,7 +83,7 @@ describe("cron store migration", () => {
     const migrated = await migrateLegacyJob(
       makeLegacyJob({
         id: "job-1",
-        sessionKey: "  agent:main:discord:channel:ops  ",
+        sessionKey: "  agent:default:discord:channel:ops  ",
         schedule: { kind: "at", atMs },
         sessionTarget: "isolated",
         payload: {
@@ -97,7 +97,7 @@ describe("cron store migration", () => {
         isolation: { postToMainPrefix: "Cron" },
       }),
     );
-    expect(migrated.sessionKey).toBe("agent:main:discord:channel:ops");
+    expect(migrated.sessionKey).toBe("agent:default:discord:channel:ops");
     expect(migrated.delivery).toEqual({
       mode: "announce",
       channel: "telegram",

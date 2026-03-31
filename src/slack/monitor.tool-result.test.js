@@ -462,7 +462,7 @@ describe("monitorSlackProvider tool results", () => {
     });
     expect(replyMock).toHaveBeenCalledTimes(1);
     const ctx = replyMock.mock.calls[0]?.[0];
-    expect(ctx.SessionKey).toBe("agent:main:slack:direct:u1:thread:123");
+    expect(ctx.SessionKey).toBe("agent:default:slack:direct:u1:thread:123");
     expect(ctx.ParentSessionKey).toBeUndefined();
   });
   it("keeps thread parent inheritance opt-in", async () => {
@@ -485,8 +485,8 @@ describe("monitorSlackProvider tool results", () => {
     });
     expect(replyMock).toHaveBeenCalledTimes(1);
     const ctx = replyMock.mock.calls[0]?.[0];
-    expect(ctx.SessionKey).toBe("agent:main:slack:channel:c1:thread:111.222");
-    expect(ctx.ParentSessionKey).toBe("agent:main:slack:channel:c1");
+    expect(ctx.SessionKey).toBe("agent:default:slack:channel:c1:thread:111.222");
+    expect(ctx.ParentSessionKey).toBe("agent:default:slack:channel:c1");
   });
   it("injects starter context for thread replies", async () => {
     replyMock.mockResolvedValue({ text: "ok" });
@@ -513,7 +513,7 @@ describe("monitorSlackProvider tool results", () => {
     await runChannelThreadReplyEvent();
     expect(replyMock).toHaveBeenCalledTimes(1);
     const ctx = replyMock.mock.calls[0]?.[0];
-    expect(ctx.SessionKey).toBe("agent:main:slack:channel:c1:thread:111.222");
+    expect(ctx.SessionKey).toBe("agent:default:slack:channel:c1:thread:111.222");
     expect(ctx.ParentSessionKey).toBeUndefined();
     expect(ctx.ThreadStarterBody).toContain("starter message");
     expect(ctx.ThreadLabel).toContain("Slack thread #general");

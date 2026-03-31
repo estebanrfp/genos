@@ -111,7 +111,7 @@ describe("cron tool", () => {
   });
   it("stamps cron.add with caller sessionKey when missing", async () => {
     callGatewayMock.mockResolvedValueOnce({ ok: true });
-    const callerSessionKey = "agent:main:discord:channel:ops";
+    const callerSessionKey = "agent:default:discord:channel:ops";
     const tool = createCronTool({ agentSessionKey: callerSessionKey });
     await tool.execute("call-session-key", {
       action: "add",
@@ -126,18 +126,18 @@ describe("cron tool", () => {
   });
   it("preserves explicit job.sessionKey on add", async () => {
     callGatewayMock.mockResolvedValueOnce({ ok: true });
-    const tool = createCronTool({ agentSessionKey: "agent:main:discord:channel:ops" });
+    const tool = createCronTool({ agentSessionKey: "agent:default:discord:channel:ops" });
     await tool.execute("call-explicit-session-key", {
       action: "add",
       job: {
         name: "wake-up",
         schedule: { at: new Date(123).toISOString() },
-        sessionKey: "agent:main:telegram:group:-100123:topic:99",
+        sessionKey: "agent:default:telegram:group:-100123:topic:99",
         payload: { kind: "systemEvent", text: "hello" },
       },
     });
     const call = callGatewayMock.mock.calls[0]?.[0];
-    expect(call?.params?.sessionKey).toBe("agent:main:telegram:group:-100123:topic:99");
+    expect(call?.params?.sessionKey).toBe("agent:default:telegram:group:-100123:topic:99");
   });
   it("adds recent context for systemEvent reminders when contextMessages > 0", async () => {
     callGatewayMock
@@ -237,7 +237,7 @@ describe("cron tool", () => {
     expect(
       await executeAddAndReadDelivery({
         callId: "call-thread",
-        agentSessionKey: "agent:main:slack:channel:general:thread:1699999999.0001",
+        agentSessionKey: "agent:default:slack:channel:general:thread:1699999999.0001",
       }),
     ).toEqual({
       mode: "announce",
@@ -249,7 +249,7 @@ describe("cron tool", () => {
     expect(
       await executeAddAndReadDelivery({
         callId: "call-telegram-topic",
-        agentSessionKey: "agent:main:telegram:group:-1001234567890:topic:99",
+        agentSessionKey: "agent:default:telegram:group:-1001234567890:topic:99",
       }),
     ).toEqual({
       mode: "announce",
@@ -261,7 +261,7 @@ describe("cron tool", () => {
     expect(
       await executeAddAndReadDelivery({
         callId: "call-null-delivery",
-        agentSessionKey: "agent:main:dm:alice",
+        agentSessionKey: "agent:default:dm:alice",
         delivery: null,
       }),
     ).toEqual({
@@ -347,7 +347,7 @@ describe("cron tool", () => {
   });
   it("does not infer delivery when mode is none", async () => {
     callGatewayMock.mockResolvedValueOnce({ ok: true });
-    const tool = createCronTool({ agentSessionKey: "agent:main:discord:dm:buddy" });
+    const tool = createCronTool({ agentSessionKey: "agent:default:discord:dm:buddy" });
     await tool.execute("call-none", {
       action: "add",
       job: {
@@ -362,7 +362,7 @@ describe("cron tool", () => {
   });
   it("does not infer announce delivery when mode is webhook", async () => {
     callGatewayMock.mockResolvedValueOnce({ ok: true });
-    const tool = createCronTool({ agentSessionKey: "agent:main:discord:dm:buddy" });
+    const tool = createCronTool({ agentSessionKey: "agent:default:discord:dm:buddy" });
     await tool.execute("call-webhook-explicit", {
       action: "add",
       job: {
@@ -379,7 +379,7 @@ describe("cron tool", () => {
     });
   });
   it("fails fast when webhook mode is missing delivery.to", async () => {
-    const tool = createCronTool({ agentSessionKey: "agent:main:discord:dm:buddy" });
+    const tool = createCronTool({ agentSessionKey: "agent:default:discord:dm:buddy" });
     await expect(
       tool.execute("call-webhook-missing", {
         action: "add",
@@ -394,7 +394,7 @@ describe("cron tool", () => {
     expect(callGatewayMock).toHaveBeenCalledTimes(0);
   });
   it("fails fast when webhook mode uses a non-http URL", async () => {
-    const tool = createCronTool({ agentSessionKey: "agent:main:discord:dm:buddy" });
+    const tool = createCronTool({ agentSessionKey: "agent:default:discord:dm:buddy" });
     await expect(
       tool.execute("call-webhook-invalid", {
         action: "add",

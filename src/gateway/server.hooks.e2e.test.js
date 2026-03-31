@@ -183,7 +183,7 @@ describe("gateway server hooks", () => {
         },
         body: JSON.stringify({
           message: "Do it",
-          sessionKey: "agent:main:dm:u99999",
+          sessionKey: "agent:default:dm:u99999",
         }),
       });
       expect(denied.status).toBe(400);
@@ -209,7 +209,7 @@ describe("gateway server hooks", () => {
           match: { path: "mapped-bad" },
           action: "agent",
           messageTemplate: "Mapped: {{payload.subject}}",
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
         },
       ],
     };
@@ -252,7 +252,7 @@ describe("gateway server hooks", () => {
         },
         body: JSON.stringify({
           message: "Bad key",
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
         }),
       });
       expect(requestBadPrefix.status).toBe(400);

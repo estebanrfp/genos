@@ -54,7 +54,7 @@ describe("delivery-queue", () => {
           gifPlayback: true,
           silent: true,
           mirror: {
-            sessionKey: "agent:main:main",
+            sessionKey: "agent:default:main",
             text: "hello",
             mediaUrls: ["https://example.com/file.png"],
           },
@@ -74,7 +74,7 @@ describe("delivery-queue", () => {
         gifPlayback: true,
         silent: true,
         mirror: {
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
           text: "hello",
           mediaUrls: ["https://example.com/file.png"],
         },
@@ -226,7 +226,7 @@ describe("delivery-queue", () => {
           gifPlayback: true,
           silent: true,
           mirror: {
-            sessionKey: "agent:main:main",
+            sessionKey: "agent:default:main",
             text: "a",
             mediaUrls: ["https://example.com/a.png"],
           },
@@ -241,7 +241,7 @@ describe("delivery-queue", () => {
           gifPlayback: true,
           silent: true,
           mirror: {
-            sessionKey: "agent:main:main",
+            sessionKey: "agent:default:main",
             text: "a",
             mediaUrls: ["https://example.com/a.png"],
           },
@@ -539,7 +539,7 @@ describe("resolveOutboundSessionRoute", () => {
       target: "channel:C123",
       replyToId: "456",
     });
-    expect(route?.sessionKey).toBe("agent:main:slack:channel:c123:thread:456");
+    expect(route?.sessionKey).toBe("agent:default:slack:channel:c123:thread:456");
     expect(route?.from).toBe("slack:channel:C123");
     expect(route?.to).toBe("channel:C123");
     expect(route?.threadId).toBe("456");
@@ -551,7 +551,7 @@ describe("resolveOutboundSessionRoute", () => {
       agentId: "main",
       target: "-100123456:topic:42",
     });
-    expect(route?.sessionKey).toBe("agent:main:telegram:group:-100123456:topic:42");
+    expect(route?.sessionKey).toBe("agent:default:telegram:group:-100123456:topic:42");
     expect(route?.from).toBe("telegram:group:-100123456:topic:42");
     expect(route?.to).toBe("telegram:-100123456");
     expect(route?.threadId).toBe(42);
@@ -564,7 +564,7 @@ describe("resolveOutboundSessionRoute", () => {
       agentId: "main",
       target: "@alice",
     });
-    expect(route?.sessionKey).toBe("agent:main:telegram:direct:@alice");
+    expect(route?.sessionKey).toBe("agent:default:telegram:direct:@alice");
     expect(route?.chatType).toBe("direct");
   });
   it("honors dmScope identity links", async () => {
@@ -582,7 +582,7 @@ describe("resolveOutboundSessionRoute", () => {
       agentId: "main",
       target: "user:123",
     });
-    expect(route?.sessionKey).toBe("agent:main:direct:alice");
+    expect(route?.sessionKey).toBe("agent:default:direct:alice");
   });
   it("strips chat_* prefixes for BlueBubbles group session keys", async () => {
     const route = await resolveOutboundSessionRoute({
@@ -591,7 +591,7 @@ describe("resolveOutboundSessionRoute", () => {
       agentId: "main",
       target: "chat_guid:ABC123",
     });
-    expect(route?.sessionKey).toBe("agent:main:bluebubbles:group:abc123");
+    expect(route?.sessionKey).toBe("agent:default:bluebubbles:group:abc123");
     expect(route?.from).toBe("group:ABC123");
   });
   it("treats Zalo Personal DM targets as direct sessions", async () => {
@@ -602,7 +602,7 @@ describe("resolveOutboundSessionRoute", () => {
       agentId: "main",
       target: "123456",
     });
-    expect(route?.sessionKey).toBe("agent:main:zalouser:direct:123456");
+    expect(route?.sessionKey).toBe("agent:default:zalouser:direct:123456");
     expect(route?.chatType).toBe("direct");
   });
   it("uses group session keys for Slack mpim allowlist entries", async () => {
@@ -621,7 +621,7 @@ describe("resolveOutboundSessionRoute", () => {
       agentId: "main",
       target: "channel:G123",
     });
-    expect(route?.sessionKey).toBe("agent:main:slack:group:g123");
+    expect(route?.sessionKey).toBe("agent:default:slack:group:g123");
     expect(route?.from).toBe("slack:group:G123");
   });
 });

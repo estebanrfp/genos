@@ -64,10 +64,10 @@ describe("directive behavior", () => {
         },
       );
       const text = extractReplyText(res);
-      expect(text).toContain("Session: agent:main:main");
+      expect(text).toContain("Session: agent:default:main");
       assertElevatedOffStatusReply(text);
       const store = loadSessionStore(storePath);
-      expect(store["agent:main:main"]?.elevatedLevel).toBe("off");
+      expect(store["agent:default:main"]?.elevatedLevel).toBe("off");
       expect(runEmbeddedPiAgent).not.toHaveBeenCalled();
     });
   });

@@ -44,7 +44,7 @@ describe("directive behavior", () => {
       expect(optionsLine).toBeTruthy();
       expect(optionsLine).toContain("elevated");
       const store = loadSessionStore(storePath);
-      expect(store["agent:main:main"]?.elevatedLevel).toBe("on");
+      expect(store["agent:default:main"]?.elevatedLevel).toBe("on");
       expect(runEmbeddedPiAgent).not.toHaveBeenCalled();
     });
   });

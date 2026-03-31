@@ -7,7 +7,7 @@ describe("classifySessionKeyShape", () => {
     expect(classifySessionKeyShape("   ")).toBe("missing");
   });
   it("classifies valid agent keys", () => {
-    expect(classifySessionKeyShape("agent:main:main")).toBe("agent");
+    expect(classifySessionKeyShape("agent:default:main")).toBe("agent");
     expect(classifySessionKeyShape("agent:research:subagent:worker")).toBe("agent");
   });
   it("classifies malformed agent keys", () => {
@@ -22,34 +22,34 @@ describe("classifySessionKeyShape", () => {
 });
 describe("session key backward compatibility", () => {
   it("classifies legacy :dm: session keys as valid agent keys", () => {
-    expect(classifySessionKeyShape("agent:main:telegram:dm:123456")).toBe("agent");
-    expect(classifySessionKeyShape("agent:main:whatsapp:dm:+15551234567")).toBe("agent");
-    expect(classifySessionKeyShape("agent:main:discord:dm:user123")).toBe("agent");
+    expect(classifySessionKeyShape("agent:default:telegram:dm:123456")).toBe("agent");
+    expect(classifySessionKeyShape("agent:default:whatsapp:dm:+15551234567")).toBe("agent");
+    expect(classifySessionKeyShape("agent:default:discord:dm:user123")).toBe("agent");
   });
   it("classifies new :direct: session keys as valid agent keys", () => {
-    expect(classifySessionKeyShape("agent:main:telegram:direct:123456")).toBe("agent");
-    expect(classifySessionKeyShape("agent:main:whatsapp:direct:+15551234567")).toBe("agent");
-    expect(classifySessionKeyShape("agent:main:discord:direct:user123")).toBe("agent");
+    expect(classifySessionKeyShape("agent:default:telegram:direct:123456")).toBe("agent");
+    expect(classifySessionKeyShape("agent:default:whatsapp:direct:+15551234567")).toBe("agent");
+    expect(classifySessionKeyShape("agent:default:discord:direct:user123")).toBe("agent");
   });
 });
 describe("getSubagentDepth", () => {
   it("returns 0 for non-subagent session keys", () => {
-    expect(getSubagentDepth("agent:main:main")).toBe(0);
+    expect(getSubagentDepth("agent:default:main")).toBe(0);
     expect(getSubagentDepth("main")).toBe(0);
     expect(getSubagentDepth(undefined)).toBe(0);
   });
   it("returns 2 for nested subagent session keys", () => {
-    expect(getSubagentDepth("agent:main:subagent:parent:subagent:child")).toBe(2);
+    expect(getSubagentDepth("agent:default:subagent:parent:subagent:child")).toBe(2);
   });
 });
 describe("isCronSessionKey", () => {
   it("matches base and run cron agent session keys", () => {
-    expect(isCronSessionKey("agent:main:cron:job-1")).toBe(true);
-    expect(isCronSessionKey("agent:main:cron:job-1:run:run-1")).toBe(true);
+    expect(isCronSessionKey("agent:default:cron:job-1")).toBe(true);
+    expect(isCronSessionKey("agent:default:cron:job-1:run:run-1")).toBe(true);
   });
   it("does not match non-cron sessions", () => {
-    expect(isCronSessionKey("agent:main:main")).toBe(false);
-    expect(isCronSessionKey("agent:main:subagent:worker")).toBe(false);
+    expect(isCronSessionKey("agent:default:main")).toBe(false);
+    expect(isCronSessionKey("agent:default:subagent:worker")).toBe(false);
     expect(isCronSessionKey("cron:job-1")).toBe(false);
     expect(isCronSessionKey(undefined)).toBe(false);
   });

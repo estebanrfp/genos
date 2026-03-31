@@ -77,7 +77,7 @@ describe("handleDirectiveOnly model persist behavior (fixes #1435)", () => {
     { provider: "anthropic", id: "claude-opus-4-5", name: "Claude Opus 4.5" },
     { provider: "openai", id: "gpt-4o", name: "GPT-4o" },
   ];
-  const sessionKey = "agent:main:dm:1";
+  const sessionKey = "agent:default:dm:1";
   const storePath = "/tmp/sessions.json";
   function createSessionEntry(overrides) {
     return {
@@ -152,6 +152,6 @@ describe("handleDirectiveOnly model persist behavior (fixes #1435)", () => {
     );
     expect(result?.text ?? "").not.toContain("failed");
     expect(sessionEntry.thinkingLevel).toBe("off");
-    expect(sessionStore["agent:main:dm:1"]?.thinkingLevel).toBe("off");
+    expect(sessionStore["agent:default:dm:1"]?.thinkingLevel).toBe("off");
   });
 });

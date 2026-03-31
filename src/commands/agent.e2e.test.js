@@ -154,7 +154,7 @@ describe("agentCommand", () => {
     await withTempHome(async (home) => {
       const store = path.join(home, "sessions.json");
       writeSessionStoreSeed(store, {
-        "agent:main:subagent:test": {
+        "agent:default:subagent:test": {
           sessionId: "session-subagent",
           updatedAt: Date.now(),
           providerOverride: "anthropic",
@@ -189,7 +189,7 @@ describe("agentCommand", () => {
       await agentCommand(
         {
           message: "hi",
-          sessionKey: "agent:main:subagent:test",
+          sessionKey: "agent:default:subagent:test",
         },
         runtime,
       );
@@ -206,7 +206,7 @@ describe("agentCommand", () => {
     await withTempHome(async (home) => {
       const store = path.join(home, "sessions.json");
       writeSessionStoreSeed(store, {
-        "agent:main:main": {
+        "agent:default:main": {
           sessionId: "sess-main",
           updatedAt: Date.now(),
         },
@@ -216,14 +216,14 @@ describe("agentCommand", () => {
         {
           message: "hi",
           sessionId: "sess-main",
-          sessionKey: "agent:main:subagent:abc",
+          sessionKey: "agent:default:subagent:abc",
         },
         runtime,
       );
       const callArgs = vi.mocked(runEmbeddedPiAgent).mock.calls.at(-1)?.[0];
-      expect(callArgs?.sessionKey).toBe("agent:main:subagent:abc");
+      expect(callArgs?.sessionKey).toBe("agent:default:subagent:abc");
       const saved = JSON.parse(fs.readFileSync(store, "utf-8"));
-      expect(saved["agent:main:subagent:abc"]?.sessionId).toBe("sess-main");
+      expect(saved["agent:default:subagent:abc"]?.sessionId).toBe("sess-main");
     });
   });
   it("derives session key from --agent when no routing target is provided", async () => {

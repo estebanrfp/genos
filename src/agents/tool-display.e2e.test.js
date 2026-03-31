@@ -35,13 +35,13 @@ describe("tool display details", () => {
       resolveToolDisplay({
         name: "sessions_history",
         args: {
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
           limit: 20,
           includeTools: true,
         },
       }),
     );
-    expect(detail).toContain("session agent:main:main");
+    expect(detail).toContain("session agent:default:main");
     expect(detail).toContain("limit 20");
     expect(detail).toContain("tools true");
   });

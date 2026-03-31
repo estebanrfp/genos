@@ -76,7 +76,7 @@ describe("web processMessage inbound contract", () => {
   it("passes a finalized MsgContext to the dispatcher", async () => {
     await processMessage(
       makeProcessMessageArgs({
-        routeSessionKey: "agent:main:whatsapp:group:123",
+        routeSessionKey: "agent:default:whatsapp:group:123",
         groupHistoryKey: "123@g.us",
         groupHistory: [],
         msg: {
@@ -100,7 +100,7 @@ describe("web processMessage inbound contract", () => {
     capturedCtx = undefined;
     await processMessage(
       makeProcessMessageArgs({
-        routeSessionKey: "agent:main:whatsapp:direct:+1000",
+        routeSessionKey: "agent:default:whatsapp:direct:+1000",
         groupHistoryKey: "+1000",
         msg: {
           id: "msg1",
@@ -126,7 +126,7 @@ describe("web processMessage inbound contract", () => {
     capturedDispatchParams = undefined;
     await processMessage(
       makeProcessMessageArgs({
-        routeSessionKey: "agent:main:whatsapp:direct:+1555",
+        routeSessionKey: "agent:default:whatsapp:direct:+1555",
         groupHistoryKey: "+1555",
         cfg: {
           agents: {
@@ -169,7 +169,7 @@ describe("web processMessage inbound contract", () => {
     ]);
     await processMessage(
       makeProcessMessageArgs({
-        routeSessionKey: "agent:main:whatsapp:group:123@g.us",
+        routeSessionKey: "agent:default:whatsapp:group:123@g.us",
         groupHistoryKey: "whatsapp:default:group:123@g.us",
         groupHistories,
         cfg: {

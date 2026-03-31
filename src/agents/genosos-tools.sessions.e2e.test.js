@@ -257,7 +257,7 @@ describe("sessions tools", () => {
   it("sessions_history resolves sessionId inputs", async () => {
     callGatewayMock.mockReset();
     const sessionId = "sess-group";
-    const targetKey = "agent:main:discord:channel:1457165743010611293";
+    const targetKey = "agent:default:discord:channel:1457165743010611293";
     callGatewayMock.mockImplementation(async (opts) => {
       const request = opts;
       if (request.method === "sessions.resolve") {
@@ -444,7 +444,7 @@ describe("sessions tools", () => {
   it("sessions_send resolves sessionId inputs", async () => {
     callGatewayMock.mockReset();
     const sessionId = "sess-send";
-    const targetKey = "agent:main:discord:channel:123";
+    const targetKey = "agent:default:discord:channel:123";
     callGatewayMock.mockImplementation(async (opts) => {
       const request = opts;
       if (request.method === "sessions.resolve") {
@@ -591,8 +591,8 @@ describe("sessions tools", () => {
     const now = Date.now();
     addSubagentRunForTests({
       runId: "run-active",
-      childSessionKey: "agent:main:subagent:active",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:active",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "investigate auth",
       cleanup: "keep",
@@ -601,8 +601,8 @@ describe("sessions tools", () => {
     });
     addSubagentRunForTests({
       runId: "run-recent",
-      childSessionKey: "agent:main:subagent:recent",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:recent",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "summarize findings",
       cleanup: "keep",
@@ -613,8 +613,8 @@ describe("sessions tools", () => {
     });
     addSubagentRunForTests({
       runId: "run-old",
-      childSessionKey: "agent:main:subagent:old",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:old",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "old completed run",
       cleanup: "keep",
@@ -624,7 +624,7 @@ describe("sessions tools", () => {
       outcome: { status: "ok" },
     });
     const tool = createGenosOSTools({
-      agentSessionKey: "agent:main:main",
+      agentSessionKey: "agent:default:main",
     }).find((candidate) => candidate.name === "subagents");
     expect(tool).toBeDefined();
     if (!tool) {
@@ -645,8 +645,8 @@ describe("sessions tools", () => {
     const now = Date.now();
     addSubagentRunForTests({
       runId: "run-usage-active",
-      childSessionKey: "agent:main:subagent:usage-active",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:usage-active",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "wait and check weather",
       cleanup: "keep",
@@ -657,7 +657,7 @@ describe("sessions tools", () => {
     const loadSessionStoreSpy = vi
       .spyOn(sessionsModule, "loadSessionStore")
       .mockImplementation(() => ({
-        "agent:main:subagent:usage-active": {
+        "agent:default:subagent:usage-active": {
           sessionId: "session-usage-active",
           updatedAt: now,
           modelProvider: "anthropic",
@@ -669,7 +669,7 @@ describe("sessions tools", () => {
       }));
     try {
       const tool = createGenosOSTools({
-        agentSessionKey: "agent:main:main",
+        agentSessionKey: "agent:default:main",
       }).find((candidate) => candidate.name === "subagents");
       expect(tool).toBeDefined();
       if (!tool) {
@@ -698,8 +698,8 @@ describe("sessions tools", () => {
     });
     addSubagentRunForTests({
       runId: "run-steer",
-      childSessionKey: "agent:main:subagent:steer",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:steer",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "prepare release notes",
       cleanup: "keep",
@@ -710,14 +710,14 @@ describe("sessions tools", () => {
     const loadSessionStoreSpy = vi
       .spyOn(sessionsModule, "loadSessionStore")
       .mockImplementation(() => ({
-        "agent:main:subagent:steer": {
+        "agent:default:subagent:steer": {
           sessionId: "child-session-steer",
           updatedAt: Date.now(),
         },
       }));
     try {
       const tool = createGenosOSTools({
-        agentSessionKey: "agent:main:main",
+        agentSessionKey: "agent:default:main",
       }).find((candidate) => candidate.name === "subagents");
       expect(tool).toBeDefined();
       if (!tool) {
@@ -749,12 +749,12 @@ describe("sessions tools", () => {
         method: "agent",
         params: {
           lane: "subagent",
-          sessionKey: "agent:main:subagent:steer",
+          sessionKey: "agent:default:subagent:steer",
           sessionId: "child-session-steer",
           timeout: 0,
         },
       });
-      const trackedRuns = listSubagentRunsForRequester("agent:main:main");
+      const trackedRuns = listSubagentRunsForRequester("agent:default:main");
       expect(trackedRuns).toHaveLength(1);
       expect(trackedRuns[0].runId).toBe("run-steer-1");
       expect(trackedRuns[0].endedAt).toBeUndefined();
@@ -768,8 +768,8 @@ describe("sessions tools", () => {
     callGatewayMock.mockReset();
     addSubagentRunForTests({
       runId: "run-active",
-      childSessionKey: "agent:main:subagent:active",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:active",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "active task",
       cleanup: "keep",
@@ -778,8 +778,8 @@ describe("sessions tools", () => {
     });
     addSubagentRunForTests({
       runId: "run-recent",
-      childSessionKey: "agent:main:subagent:recent",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:recent",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "recent task",
       cleanup: "keep",
@@ -789,7 +789,7 @@ describe("sessions tools", () => {
       outcome: { status: "ok" },
     });
     const tool = createGenosOSTools({
-      agentSessionKey: "agent:main:main",
+      agentSessionKey: "agent:default:main",
     }).find((candidate) => candidate.name === "subagents");
     expect(tool).toBeDefined();
     if (!tool) {
@@ -810,8 +810,8 @@ describe("sessions tools", () => {
     callGatewayMock.mockReset();
     addSubagentRunForTests({
       runId: "run-kill",
-      childSessionKey: "agent:main:subagent:kill",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:kill",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "long running task",
       cleanup: "keep",
@@ -819,7 +819,7 @@ describe("sessions tools", () => {
       startedAt: Date.now() - 60000,
     });
     const tool = createGenosOSTools({
-      agentSessionKey: "agent:main:main",
+      agentSessionKey: "agent:default:main",
     }).find((candidate) => candidate.name === "subagents");
     expect(tool).toBeDefined();
     if (!tool) {
@@ -838,12 +838,12 @@ describe("sessions tools", () => {
     resetSubagentRegistryForTests();
     callGatewayMock.mockReset();
     const now = Date.now();
-    const endedParentKey = "agent:main:subagent:parent-ended";
-    const activeChildKey = "agent:main:subagent:parent-ended:subagent:worker";
+    const endedParentKey = "agent:default:subagent:parent-ended";
+    const activeChildKey = "agent:default:subagent:parent-ended:subagent:worker";
     addSubagentRunForTests({
       runId: "run-parent-ended",
       childSessionKey: endedParentKey,
-      requesterSessionKey: "agent:main:main",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "orchestrator",
       cleanup: "keep",
@@ -863,7 +863,7 @@ describe("sessions tools", () => {
       startedAt: now - 30000,
     });
     const tool = createGenosOSTools({
-      agentSessionKey: "agent:main:main",
+      agentSessionKey: "agent:default:main",
     }).find((candidate) => candidate.name === "subagents");
     expect(tool).toBeDefined();
     if (!tool) {

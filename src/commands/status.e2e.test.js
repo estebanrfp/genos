@@ -77,7 +77,7 @@ const mocks = vi.hoisted(() => ({
   loadSessionStore: vi.fn().mockReturnValue({
     "+1000": createDefaultSessionStoreEntry(),
   }),
-  resolveMainSessionKey: vi.fn().mockReturnValue("agent:main:main"),
+  resolveMainSessionKey: vi.fn().mockReturnValue("agent:default:main"),
   resolveStorePath: vi.fn().mockReturnValue("/tmp/sessions.json"),
   webAuthExists: vi.fn().mockResolvedValue(true),
   getWebAuthAgeMs: vi.fn().mockReturnValue(5000),
@@ -97,7 +97,7 @@ const mocks = vi.hoisted(() => ({
   callGateway: vi.fn().mockResolvedValue({}),
   listAgentsForGateway: vi.fn().mockReturnValue({
     defaultId: "main",
-    mainKey: "agent:main:main",
+    mainKey: "agent:default:main",
     scope: "per-sender",
     agents: [{ id: "main", name: "Main" }],
   }),
@@ -457,7 +457,7 @@ describe("statusCommand", () => {
     const originalLoadSessionStore = mocks.loadSessionStore.getMockImplementation();
     mocks.listAgentsForGateway.mockReturnValue({
       defaultId: "main",
-      mainKey: "agent:main:main",
+      mainKey: "agent:default:main",
       scope: "per-sender",
       agents: [
         { id: "main", name: "Main" },

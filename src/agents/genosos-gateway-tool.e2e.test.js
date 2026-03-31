@@ -59,7 +59,7 @@ describe("gateway tool", () => {
   it("passes config.apply through gateway call", async () => {
     const { callGatewayTool } = await import("./tools/gateway.js");
     const tool = createGenosOSTools({
-      agentSessionKey: "agent:main:whatsapp:dm:+15555550123",
+      agentSessionKey: "agent:default:whatsapp:dm:+15555550123",
     }).find((candidate) => candidate.name === "gateway");
     expect(tool).toBeDefined();
     if (!tool) {
@@ -77,14 +77,14 @@ describe("gateway tool", () => {
       expect.objectContaining({
         raw: raw.trim(),
         baseHash: "hash-1",
-        sessionKey: "agent:main:whatsapp:dm:+15555550123",
+        sessionKey: "agent:default:whatsapp:dm:+15555550123",
       }),
     );
   });
   it("passes config.patch through gateway call", async () => {
     const { callGatewayTool } = await import("./tools/gateway.js");
     const tool = createGenosOSTools({
-      agentSessionKey: "agent:main:whatsapp:dm:+15555550123",
+      agentSessionKey: "agent:default:whatsapp:dm:+15555550123",
     }).find((candidate) => candidate.name === "gateway");
     expect(tool).toBeDefined();
     if (!tool) {
@@ -102,14 +102,14 @@ describe("gateway tool", () => {
       expect.objectContaining({
         raw: raw.trim(),
         baseHash: "hash-1",
-        sessionKey: "agent:main:whatsapp:dm:+15555550123",
+        sessionKey: "agent:default:whatsapp:dm:+15555550123",
       }),
     );
   });
   it("passes update.run through gateway call", async () => {
     const { callGatewayTool } = await import("./tools/gateway.js");
     const tool = createGenosOSTools({
-      agentSessionKey: "agent:main:whatsapp:dm:+15555550123",
+      agentSessionKey: "agent:default:whatsapp:dm:+15555550123",
     }).find((candidate) => candidate.name === "gateway");
     expect(tool).toBeDefined();
     if (!tool) {
@@ -124,7 +124,7 @@ describe("gateway tool", () => {
       expect.any(Object),
       expect.objectContaining({
         note: "test update",
-        sessionKey: "agent:main:whatsapp:dm:+15555550123",
+        sessionKey: "agent:default:whatsapp:dm:+15555550123",
       }),
     );
     const updateCall = vi

@@ -49,7 +49,7 @@ async function writeSessionStore(home, entries = {}) {
     storePath,
     JSON.stringify(
       {
-        "agent:main:main": {
+        "agent:default:main": {
           sessionId: "main-session",
           updatedAt: Date.now(),
           lastProvider: "webchat",
@@ -115,7 +115,7 @@ async function runTurnWithStoredModelOverride(home, jobPayload, modelOverride = 
   return runCronTurn(home, {
     jobPayload,
     storeEntries: {
-      "agent:main:cron:job-1": {
+      "agent:default:cron:job-1": {
         sessionId: "existing-cron-session",
         updatedAt: Date.now(),
         providerOverride: "openai",
@@ -251,7 +251,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("keeps hooks.gmail.model precedence over stored session override", async () => {
     await withTempHome(async (home) => {
       const { res } = await runGmailHookTurn(home, {
-        "agent:main:hook:gmail:msg-1": {
+        "agent:default:hook:gmail:msg-1": {
           sessionId: "existing-gmail-session",
           updatedAt: Date.now(),
           providerOverride: "anthropic",
@@ -401,8 +401,8 @@ describe("runCronIsolatedAgentTurn", () => {
       expect(first.sessionId).toBeDefined();
       expect(second.sessionId).toBeDefined();
       expect(second.sessionId).not.toBe(first.sessionId);
-      expect(first.sessionKey).toMatch(/^agent:main:cron:job-1:run:/);
-      expect(second.sessionKey).toMatch(/^agent:main:cron:job-1:run:/);
+      expect(first.sessionKey).toMatch(/^agent:default:cron:job-1:run:/);
+      expect(second.sessionKey).toMatch(/^agent:default:cron:job-1:run:/);
       expect(second.sessionKey).not.toBe(first.sessionKey);
     });
   });
@@ -411,7 +411,7 @@ describe("runCronIsolatedAgentTurn", () => {
       const storePath = await writeSessionStore(home);
       const raw = await fs.readFile(storePath, "utf-8");
       const store = JSON.parse(raw);
-      store["agent:main:cron:job-1"] = {
+      store["agent:default:cron:job-1"] = {
         sessionId: "old",
         updatedAt: Date.now(),
         label: "Nightly digest",
@@ -422,7 +422,7 @@ describe("runCronIsolatedAgentTurn", () => {
         message: "ping",
         storePath,
       });
-      const entry = await readSessionEntry(storePath, "agent:main:cron:job-1");
+      const entry = await readSessionEntry(storePath, "agent:default:cron:job-1");
       expect(entry?.label).toBe("Nightly digest");
     });
   });

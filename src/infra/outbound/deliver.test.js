@@ -420,14 +420,14 @@ describe("deliverOutboundPayloads", () => {
       payloads: [{ text: "abcd" }],
       deps: { sendWhatsApp },
       mirror: {
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
       },
     });
     expect(internalHookMocks.createInternalHookEvent).toHaveBeenCalledTimes(1);
     expect(internalHookMocks.createInternalHookEvent).toHaveBeenCalledWith(
       "message",
       "sent",
-      "agent:main:main",
+      "agent:default:main",
       expect.objectContaining({
         to: "+1555",
         content: "abcd",
@@ -522,7 +522,7 @@ describe("deliverOutboundPayloads", () => {
       payloads: [{ text: "caption", mediaUrl: "https://example.com/files/report.pdf?sig=1" }],
       deps: { sendTelegram },
       mirror: {
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         text: "caption",
         mediaUrls: ["https://example.com/files/report.pdf?sig=1"],
       },

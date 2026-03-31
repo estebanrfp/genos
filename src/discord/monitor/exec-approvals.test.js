@@ -149,19 +149,19 @@ describe("roundtrip encoding", () => {
 });
 describe("extractDiscordChannelId", () => {
   it("extracts channel ID from standard session key", () => {
-    expect(extractDiscordChannelId("agent:main:discord:channel:123456789")).toBe("123456789");
+    expect(extractDiscordChannelId("agent:default:discord:channel:123456789")).toBe("123456789");
   });
   it("extracts channel ID from agent session key", () => {
     expect(extractDiscordChannelId("agent:test-agent:discord:channel:999888777")).toBe("999888777");
   });
   it("extracts channel ID from group session key", () => {
-    expect(extractDiscordChannelId("agent:main:discord:group:222333444")).toBe("222333444");
+    expect(extractDiscordChannelId("agent:default:discord:group:222333444")).toBe("222333444");
   });
   it("returns null for non-discord session key", () => {
-    expect(extractDiscordChannelId("agent:main:telegram:channel:123456789")).toBeNull();
+    expect(extractDiscordChannelId("agent:default:telegram:channel:123456789")).toBeNull();
   });
   it("returns null for session key without channel segment", () => {
-    expect(extractDiscordChannelId("agent:main:discord:dm:123456789")).toBeNull();
+    expect(extractDiscordChannelId("agent:default:discord:dm:123456789")).toBeNull();
   });
   it("returns null for null input", () => {
     expect(extractDiscordChannelId(null)).toBeNull();
@@ -500,7 +500,7 @@ describe("DiscordExecApprovalHandler delivery routing", () => {
       }
       return { id: "msg-unknown" };
     });
-    const request = createRequest({ sessionKey: "agent:main:discord:dm:123" });
+    const request = createRequest({ sessionKey: "agent:default:discord:dm:123" });
     await internals.handleApprovalRequested(request);
     expect(mockRestPost).toHaveBeenCalledTimes(2);
     expect(mockRestPost).toHaveBeenCalledWith(Routes.userChannels(), {

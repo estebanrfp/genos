@@ -83,7 +83,7 @@ describe("resolveSessionKeyFromResolveParams — label + agentId fallback", () =
   it("rejects multiple selectors", async () => {
     const result = await resolveSessionKeyFromResolveParams({
       cfg,
-      p: { label: "main", key: "agent:main:main" },
+      p: { label: "main", key: "agent:default:main" },
     });
 
     expect(result.ok).toBe(false);

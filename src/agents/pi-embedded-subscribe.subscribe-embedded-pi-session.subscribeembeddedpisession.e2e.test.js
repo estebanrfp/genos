@@ -392,7 +392,7 @@ describe("subscribeEmbeddedPiSession", () => {
       emit,
       toolName: "session_status",
       toolCallId: "s1",
-      args: { sessionKey: "agent:main:main", model: "openai/gpt-4o" },
+      args: { sessionKey: "agent:default:main", model: "openai/gpt-4o" },
       isError: true,
       result: { error: "Model not allowed." },
     });
@@ -400,7 +400,7 @@ describe("subscribeEmbeddedPiSession", () => {
       emit,
       toolName: "session_status",
       toolCallId: "s2",
-      args: { sessionKey: "agent:main:main" },
+      args: { sessionKey: "agent:default:main" },
       isError: false,
       result: { ok: true },
     });

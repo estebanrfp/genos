@@ -83,7 +83,7 @@ describe("update.run sentinel deliveryContext", () => {
   it("includes deliveryContext in sentinel payload when sessionKey is provided", async () => {
     capturedPayload = undefined;
     let responded = false;
-    await invokeUpdateRun({ sessionKey: "agent:main:webchat:dm:user-123" }, () => {
+    await invokeUpdateRun({ sessionKey: "agent:default:webchat:dm:user-123" }, () => {
       responded = true;
     });
     expect(responded).toBe(true);
@@ -103,7 +103,7 @@ describe("update.run sentinel deliveryContext", () => {
   });
   it("includes threadId in sentinel payload for threaded sessions", async () => {
     capturedPayload = undefined;
-    await invokeUpdateRun({ sessionKey: "agent:main:slack:dm:C0123ABC:thread:1234567890.123456" });
+    await invokeUpdateRun({ sessionKey: "agent:default:slack:dm:C0123ABC:thread:1234567890.123456" });
     expect(capturedPayload).toBeDefined();
     expect(capturedPayload.deliveryContext).toEqual({
       channel: "slack",

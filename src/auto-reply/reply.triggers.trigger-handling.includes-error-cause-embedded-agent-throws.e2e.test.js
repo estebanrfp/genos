@@ -141,7 +141,7 @@ Logs: genosos logs --follow`);
       const text = Array.isArray(res) ? res[0]?.text : res?.text;
       expect(text).toContain("Group activation set to always");
       const store = JSON.parse(await fs.readFile(requireSessionStorePath(cfg), "utf-8"));
-      expect(store["agent:main:whatsapp:group:123@g.us"]?.groupActivation).toBe("always");
+      expect(store["agent:default:whatsapp:group:123@g.us"]?.groupActivation).toBe("always");
       expect(runEmbeddedPiAgentMock).not.toHaveBeenCalled();
     });
   });

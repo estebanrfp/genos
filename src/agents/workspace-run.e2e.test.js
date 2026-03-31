@@ -8,7 +8,7 @@ describe("resolveRunWorkspaceDir", () => {
     const explicit = path.join(process.cwd(), "tmp", "workspace-run-explicit");
     const result = resolveRunWorkspaceDir({
       workspaceDir: explicit,
-      sessionKey: "agent:main:subagent:test",
+      sessionKey: "agent:default:subagent:test",
     });
     expect(result.usedFallback).toBe(false);
     expect(result.agentId).toBe("main");
@@ -42,7 +42,7 @@ describe("resolveRunWorkspaceDir", () => {
     };
     const result = resolveRunWorkspaceDir({
       workspaceDir: "   ",
-      sessionKey: "agent:main:subagent:test",
+      sessionKey: "agent:default:subagent:test",
       config: cfg,
     });
     expect(result.usedFallback).toBe(true);
@@ -53,7 +53,7 @@ describe("resolveRunWorkspaceDir", () => {
   it("falls back to built-in main workspace when config is unavailable", () => {
     const result = resolveRunWorkspaceDir({
       workspaceDir: null,
-      sessionKey: "agent:main:subagent:test",
+      sessionKey: "agent:default:subagent:test",
       config: undefined,
     });
     expect(result.usedFallback).toBe(true);

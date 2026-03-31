@@ -216,7 +216,7 @@ describe("heartbeat-wake", () => {
     requestHeartbeatNow({
       reason: "cron:job-b",
       agentId: "main",
-      sessionKey: "agent:main:telegram:group:-1001",
+      sessionKey: "agent:default:telegram:group:-1001",
       coalesceMs: 100,
     });
     await vi.advanceTimersByTimeAsync(100);
@@ -231,7 +231,7 @@ describe("heartbeat-wake", () => {
         {
           reason: "cron:job-b",
           agentId: "main",
-          sessionKey: "agent:main:telegram:group:-1001",
+          sessionKey: "agent:default:telegram:group:-1001",
         },
       ]),
     );

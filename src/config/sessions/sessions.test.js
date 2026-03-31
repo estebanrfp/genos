@@ -83,7 +83,7 @@ describe("session store lock (Promise chain mutex)", () => {
     lockTmpDirs = [];
   });
   it("serializes concurrent updateSessionStore calls without data loss", async () => {
-    const key = "agent:main:test";
+    const key = "agent:default:test";
     const { storePath } = await makeTmpStore({
       [key]: { sessionId: "s1", updatedAt: 100, counter: 0 },
     });
@@ -102,7 +102,7 @@ describe("session store lock (Promise chain mutex)", () => {
     expect(store[key].counter).toBe(N);
   });
   it("multiple consecutive errors do not permanently poison the queue", async () => {
-    const key = "agent:main:multi-err";
+    const key = "agent:default:multi-err";
     const { storePath } = await makeTmpStore({
       [key]: { sessionId: "s1", updatedAt: 100 },
     });

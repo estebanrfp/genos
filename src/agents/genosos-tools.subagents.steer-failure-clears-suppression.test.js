@@ -33,8 +33,8 @@ describe("genosos-tools: subagents steer failure", () => {
   it("restores announce behavior when steer replacement dispatch fails", async () => {
     addSubagentRunForTests({
       runId: "run-old",
-      childSessionKey: "agent:main:subagent:worker",
-      requesterSessionKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:worker",
+      requesterSessionKey: "agent:default:main",
       requesterDisplayKey: "main",
       task: "do work",
       cleanup: "keep",
@@ -52,7 +52,7 @@ describe("genosos-tools: subagents steer failure", () => {
       return {};
     });
     const tool = createSubagentsTool({
-      agentSessionKey: "agent:main:main",
+      agentSessionKey: "agent:default:main",
     });
     const result = await tool.execute("call-steer", {
       action: "steer",
@@ -65,7 +65,7 @@ describe("genosos-tools: subagents steer failure", () => {
       runId: expect.any(String),
       error: "dispatch failed",
     });
-    const runs = listSubagentRunsForRequester("agent:main:main");
+    const runs = listSubagentRunsForRequester("agent:default:main");
     expect(runs).toHaveLength(1);
     expect(runs[0].runId).toBe("run-old");
     expect(runs[0].suppressAnnounceReason).toBeUndefined();

@@ -23,16 +23,16 @@ describe("getDmHistoryLimitFromSessionKey", () => {
     const config = {
       channels: { telegram: { dmHistoryLimit: 10 } },
     };
-    expect(getDmHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config)).toBe(10);
+    expect(getDmHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config)).toBe(10);
   });
   it("strips thread suffix from dm session keys", () => {
     const config = {
       channels: { telegram: { dmHistoryLimit: 10, dms: { 123: { historyLimit: 7 } } } },
     };
-    expect(getDmHistoryLimitFromSessionKey("agent:main:telegram:dm:123:thread:999", config)).toBe(
+    expect(getDmHistoryLimitFromSessionKey("agent:default:telegram:dm:123:thread:999", config)).toBe(
       7,
     );
-    expect(getDmHistoryLimitFromSessionKey("agent:main:telegram:dm:123:topic:555", config)).toBe(7);
+    expect(getDmHistoryLimitFromSessionKey("agent:default:telegram:dm:123:topic:555", config)).toBe(7);
     expect(getDmHistoryLimitFromSessionKey("telegram:dm:123:thread:999", config)).toBe(7);
   });
   it("keeps non-numeric thread markers in dm ids", () => {
@@ -41,7 +41,7 @@ describe("getDmHistoryLimitFromSessionKey", () => {
         telegram: { dms: { "user:thread:abc": { historyLimit: 9 } } },
       },
     };
-    expect(getDmHistoryLimitFromSessionKey("agent:main:telegram:dm:user:thread:abc", config)).toBe(
+    expect(getDmHistoryLimitFromSessionKey("agent:default:telegram:dm:user:thread:abc", config)).toBe(
       9,
     );
   });
@@ -116,7 +116,7 @@ describe("getDmHistoryLimitFromSessionKey", () => {
         20,
       );
       expect(
-        getDmHistoryLimitFromSessionKey(`agent:main:${provider}:dm:user123`, configWithOverride),
+        getDmHistoryLimitFromSessionKey(`agent:default:${provider}:dm:user123`, configWithOverride),
       ).toBe(7);
     }
   });
@@ -147,7 +147,7 @@ describe("getDmHistoryLimitFromSessionKey", () => {
         channels: { [provider]: { historyLimit: 12 } },
       };
       expect(getDmHistoryLimitFromSessionKey(`${provider}:channel:123`, config)).toBe(12);
-      expect(getDmHistoryLimitFromSessionKey(`agent:main:${provider}:channel:456`, config)).toBe(
+      expect(getDmHistoryLimitFromSessionKey(`agent:default:${provider}:channel:456`, config)).toBe(
         12,
       );
     }
@@ -160,7 +160,7 @@ describe("getDmHistoryLimitFromSessionKey", () => {
       },
     };
     expect(getDmHistoryLimitFromSessionKey("discord:group:123", config)).toBe(15);
-    expect(getDmHistoryLimitFromSessionKey("agent:main:slack:group:abc", config)).toBe(10);
+    expect(getDmHistoryLimitFromSessionKey("agent:default:slack:group:abc", config)).toBe(10);
   });
   it("returns undefined for channel sessions when historyLimit is not configured", () => {
     const config = {
@@ -176,9 +176,9 @@ describe("getDmHistoryLimitFromSessionKey", () => {
         channels: { telegram: { dmHistoryLimit: 10 } },
       };
       expect(getDmHistoryLimitFromSessionKey("telegram:dm:123", config)).toBe(10);
-      expect(getDmHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config)).toBe(10);
+      expect(getDmHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config)).toBe(10);
       expect(getDmHistoryLimitFromSessionKey("telegram:direct:123", config)).toBe(10);
-      expect(getDmHistoryLimitFromSessionKey("agent:main:telegram:direct:123", config)).toBe(10);
+      expect(getDmHistoryLimitFromSessionKey("agent:default:telegram:direct:123", config)).toBe(10);
     });
   });
 });

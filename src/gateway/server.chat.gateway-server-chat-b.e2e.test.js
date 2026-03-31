@@ -106,8 +106,8 @@ describe("gateway server chat", () => {
         throw new Error("expected session store path");
       }
       const stored = JSON.parse(await fs.readFile(sessionStorePath, "utf-8"));
-      expect(stored["agent:main:main"]?.lastChannel).toBe("whatsapp");
-      expect(stored["agent:main:main"]?.lastTo).toBe("+1555");
+      expect(stored["agent:default:main"]?.lastChannel).toBe("whatsapp");
+      expect(stored["agent:default:main"]?.lastTo).toBe("+1555");
     });
   });
   test("chat.send does not force-disable block streaming", async () => {

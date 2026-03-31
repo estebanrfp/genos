@@ -54,14 +54,14 @@ describe("session reference shape detection", () => {
   });
   it("detects canonical session key families", () => {
     expect(looksLikeSessionKey("main")).toBe(true);
-    expect(looksLikeSessionKey("agent:main:main")).toBe(true);
+    expect(looksLikeSessionKey("agent:default:main")).toBe(true);
     expect(looksLikeSessionKey("cron:daily-report")).toBe(true);
     expect(looksLikeSessionKey("node:macbook")).toBe(true);
     expect(looksLikeSessionKey("telegram:group:123")).toBe(true);
     expect(looksLikeSessionKey("random-slug")).toBe(false);
   });
   it("treats non-keys as session-id candidates", () => {
-    expect(shouldResolveSessionIdInput("agent:main:main")).toBe(false);
+    expect(shouldResolveSessionIdInput("agent:default:main")).toBe(false);
     expect(shouldResolveSessionIdInput("d4f5a5a1-9f75-42cf-83a6-8d170e6a1538")).toBe(true);
     expect(shouldResolveSessionIdInput("random-slug")).toBe(true);
   });

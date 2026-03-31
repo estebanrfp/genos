@@ -77,10 +77,10 @@ describe("normalizeCronJobCreate", () => {
       schedule: { kind: "cron", expr: "* * * * *" },
       sessionTarget: "main",
       wakeMode: "next-heartbeat",
-      sessionKey: "  agent:main:discord:channel:ops  ",
+      sessionKey: "  agent:default:discord:channel:ops  ",
       payload: { kind: "systemEvent", text: "hi" },
     });
-    expect(normalized.sessionKey).toBe("agent:main:discord:channel:ops");
+    expect(normalized.sessionKey).toBe("agent:default:discord:channel:ops");
     const cleared = normalizeCronJobCreate({
       name: "session-key-clear",
       enabled: true,
@@ -354,9 +354,9 @@ describe("normalizeCronJobPatch", () => {
   });
   it("preserves null sessionKey patches and trims string values", () => {
     const trimmed = normalizeCronJobPatch({
-      sessionKey: "  agent:main:telegram:group:-100123  ",
+      sessionKey: "  agent:default:telegram:group:-100123  ",
     });
-    expect(trimmed.sessionKey).toBe("agent:main:telegram:group:-100123");
+    expect(trimmed.sessionKey).toBe("agent:default:telegram:group:-100123");
     const cleared = normalizeCronJobPatch({
       sessionKey: null,
     });

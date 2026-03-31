@@ -163,14 +163,14 @@ describe("exec tool backgrounding", () => {
     const customBash = createExecTool({
       elevated: { enabled: true, allowed: false, defaultLevel: "off" },
       messageProvider: "telegram",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     await expect(
       customBash.execute("call1", {
         command: "echo hi",
         elevated: true,
       }),
-    ).rejects.toThrow("Context: provider=telegram session=agent:main:main");
+    ).rejects.toThrow("Context: provider=telegram session=agent:default:main");
   });
   it("does not default to elevated when not allowed", async () => {
     const customBash = createExecTool({
@@ -305,7 +305,7 @@ describe("exec notifyOnExit", () => {
       allowBackground: true,
       backgroundMs: 0,
       notifyOnExit: true,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     const result = await tool.execute("call1", {
       command: echoAfterDelay("notify"),
@@ -315,12 +315,12 @@ describe("exec notifyOnExit", () => {
     const sessionId = result.details.sessionId;
     const prefix = sessionId.slice(0, 8);
     let finished = getFinishedSession(sessionId);
-    let hasEvent = peekSystemEvents("agent:main:main").some((event) => event.includes(prefix));
+    let hasEvent = peekSystemEvents("agent:default:main").some((event) => event.includes(prefix));
     await expect
       .poll(
         () => {
           finished = getFinishedSession(sessionId);
-          hasEvent = peekSystemEvents("agent:main:main").some((event) => event.includes(prefix));
+          hasEvent = peekSystemEvents("agent:default:main").some((event) => event.includes(prefix));
           return Boolean(finished && hasEvent);
         },
         { timeout: isWin ? 12000 : 5000, interval: 20 },
@@ -330,7 +330,7 @@ describe("exec notifyOnExit", () => {
       finished = getFinishedSession(sessionId);
     }
     if (!hasEvent) {
-      hasEvent = peekSystemEvents("agent:main:main").some((event) => event.includes(prefix));
+      hasEvent = peekSystemEvents("agent:default:main").some((event) => event.includes(prefix));
     }
     expect(finished).toBeTruthy();
     expect(hasEvent).toBe(true);
@@ -340,7 +340,7 @@ describe("exec notifyOnExit", () => {
       allowBackground: true,
       backgroundMs: 0,
       notifyOnExit: true,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     const result = await tool.execute("call2", {
       command: shortDelayCmd,
@@ -350,7 +350,7 @@ describe("exec notifyOnExit", () => {
     const sessionId = result.details.sessionId;
     const status = await waitForCompletion(sessionId);
     expect(status).toBe("completed");
-    expect(peekSystemEvents("agent:main:main")).toEqual([]);
+    expect(peekSystemEvents("agent:default:main")).toEqual([]);
   });
   it("can re-enable no-op completion events via notifyOnExitEmptySuccess", async () => {
     const tool = createExecTool({
@@ -358,7 +358,7 @@ describe("exec notifyOnExit", () => {
       backgroundMs: 0,
       notifyOnExit: true,
       notifyOnExitEmptySuccess: true,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     const result = await tool.execute("call3", {
       command: shortDelayCmd,
@@ -368,7 +368,7 @@ describe("exec notifyOnExit", () => {
     const sessionId = result.details.sessionId;
     const status = await waitForCompletion(sessionId);
     expect(status).toBe("completed");
-    const events = peekSystemEvents("agent:main:main");
+    const events = peekSystemEvents("agent:default:main");
     expect(events.length).toBeGreaterThan(0);
     expect(events.some((event) => event.includes("Exec completed"))).toBe(true);
   });

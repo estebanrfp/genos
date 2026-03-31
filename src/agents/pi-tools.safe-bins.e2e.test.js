@@ -79,7 +79,7 @@ describe("createGenosOSCodingTools safeBins", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: tmpDir,
       agentDir: path.join(tmpDir, "agent"),
     });
@@ -123,7 +123,7 @@ describe("createGenosOSCodingTools safeBins", () => {
     };
     const tools = createGenosOSCodingTools({
       config: cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       workspaceDir: tmpDir,
       agentDir: path.join(tmpDir, "agent"),
     });

@@ -11,7 +11,7 @@ vi.mock("../config/sessions.js", () => ({
     const match = key.match(/^agent:([^:]+)/);
     return match?.[1] ?? "main";
   },
-  resolveMainSessionKey: () => "agent:main:main",
+  resolveMainSessionKey: () => "agent:default:main",
   resolveStorePath: () => "/tmp/test-store",
   updateSessionStore: vi.fn(),
 }));
@@ -53,9 +53,9 @@ describe("announce loop guard (#18264)", () => {
     const now = Date.now();
     registry.addSubagentRunForTests({
       runId: "test-loop-guard",
-      childSessionKey: "agent:main:subagent:child-1",
-      requesterSessionKey: "agent:main:main",
-      requesterDisplayKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:child-1",
+      requesterSessionKey: "agent:default:main",
+      requesterDisplayKey: "agent:default:main",
       task: "test task",
       cleanup: "keep",
       createdAt: now - 60000,
@@ -64,7 +64,7 @@ describe("announce loop guard (#18264)", () => {
       announceRetryCount: 3,
       lastAnnounceRetryAt: now - 1e4,
     });
-    const runs = registry.listSubagentRunsForRequester("agent:main:main");
+    const runs = registry.listSubagentRunsForRequester("agent:default:main");
     const entry = runs.find((r) => r.runId === "test-loop-guard");
     expect(entry).toBeDefined();
     expect(entry.announceRetryCount).toBe(3);
@@ -79,9 +79,9 @@ describe("announce loop guard (#18264)", () => {
     const now = Date.now();
     const entry = {
       runId: "test-expired-loop",
-      childSessionKey: "agent:main:subagent:expired-child",
-      requesterSessionKey: "agent:main:main",
-      requesterDisplayKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:expired-child",
+      requesterSessionKey: "agent:default:main",
+      requesterDisplayKey: "agent:default:main",
       task: "expired test task",
       cleanup: "keep",
       createdAt: now - 900000,
@@ -93,7 +93,7 @@ describe("announce loop guard (#18264)", () => {
     loadSubagentRegistryFromDisk.mockReturnValue(new Map([[entry.runId, entry]]));
     registry.initSubagentRegistry();
     expect(announceFn).not.toHaveBeenCalled();
-    const runs = registry.listSubagentRunsForRequester("agent:main:main");
+    const runs = registry.listSubagentRunsForRequester("agent:default:main");
     const stored = runs.find((run) => run.runId === entry.runId);
     expect(stored?.cleanupCompletedAt).toBeDefined();
   });
@@ -106,9 +106,9 @@ describe("announce loop guard (#18264)", () => {
     const now = Date.now();
     const entry = {
       runId: "test-retry-budget",
-      childSessionKey: "agent:main:subagent:retry-budget",
-      requesterSessionKey: "agent:main:main",
-      requesterDisplayKey: "agent:main:main",
+      childSessionKey: "agent:default:subagent:retry-budget",
+      requesterSessionKey: "agent:default:main",
+      requesterDisplayKey: "agent:default:main",
       task: "retry budget test",
       cleanup: "keep",
       createdAt: now - 120000,
@@ -120,7 +120,7 @@ describe("announce loop guard (#18264)", () => {
     loadSubagentRegistryFromDisk.mockReturnValue(new Map([[entry.runId, entry]]));
     registry.initSubagentRegistry();
     expect(announceFn).not.toHaveBeenCalled();
-    const runs = registry.listSubagentRunsForRequester("agent:main:main");
+    const runs = registry.listSubagentRunsForRequester("agent:default:main");
     const stored = runs.find((run) => run.runId === entry.runId);
     expect(stored?.cleanupCompletedAt).toBeDefined();
   });

@@ -142,7 +142,7 @@ describe("discord tool result dispatch", () => {
       },
       client,
     );
-    expect(capturedCtx?.SessionKey).toBe("agent:main:discord:channel:c1");
+    expect(capturedCtx?.SessionKey).toBe("agent:default:discord:channel:c1");
   });
   it("prefixes group bodies with sender label", async () => {
     let capturedBody = "";

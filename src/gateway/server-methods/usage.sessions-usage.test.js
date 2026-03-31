@@ -121,7 +121,7 @@ describe("sessions.usage", () => {
     expect(result.sessions).toHaveLength(2);
     expect(result.sessions[0].key).toBe("agent:opus:s-opus");
     expect(result.sessions[0].agentId).toBe("opus");
-    expect(result.sessions[1].key).toBe("agent:main:s-main");
+    expect(result.sessions[1].key).toBe("agent:default:s-main");
     expect(result.sessions[1].agentId).toBe("main");
   });
   it("resolves store entries by sessionId when queried via discovered agent-prefixed key", async () => {

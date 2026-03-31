@@ -61,12 +61,12 @@ describe("buildGatewayCronService", () => {
       expect(enqueueSystemEventMock).toHaveBeenCalledWith(
         "hello",
         expect.objectContaining({
-          sessionKey: "agent:main:discord:channel:ops",
+          sessionKey: "agent:default:discord:channel:ops",
         }),
       );
       expect(requestHeartbeatNowMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          sessionKey: "agent:main:discord:channel:ops",
+          sessionKey: "agent:default:discord:channel:ops",
         }),
       );
     } finally {

@@ -7,7 +7,7 @@ let mockMainSessionEntry = function (entry, cfg = {}) {
         updatedAt: Date.now(),
         ...entry,
       },
-      canonicalKey: "agent:main:main",
+      canonicalKey: "agent:default:main",
     });
   },
   captureUpdatedMainEntry = function () {
@@ -15,7 +15,7 @@ let mockMainSessionEntry = function (entry, cfg = {}) {
     mocks.updateSessionStore.mockImplementation(async (_path, updater) => {
       const store = {};
       await updater(store);
-      capturedEntry = store["agent:main:main"];
+      capturedEntry = store["agent:default:main"];
     });
     return () => capturedEntry;
   };
@@ -93,7 +93,7 @@ async function runMainAgent(message, idempotencyKey) {
     {
       message,
       agentId: "main",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       idempotencyKey,
     },
     { respond, reqId: idempotencyKey },
@@ -166,7 +166,7 @@ describe("gateway agent handler", () => {
         sessionId: "existing-session-id",
         updatedAt: Date.now(),
       },
-      canonicalKey: "agent:main:main",
+      canonicalKey: "agent:default:main",
     });
     mocks.updateSessionStore.mockResolvedValue(undefined);
     mocks.agentCommand.mockResolvedValue({
@@ -177,7 +177,7 @@ describe("gateway agent handler", () => {
       {
         message: "Is it the weekend?",
         agentId: "main",
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         idempotencyKey: "test-timestamp-inject",
       },
       { reqId: "ts-1" },
@@ -213,13 +213,13 @@ describe("gateway agent handler", () => {
         sessionId: "existing-session-id",
         updatedAt: Date.now(),
       },
-      canonicalKey: "agent:main:work",
+      canonicalKey: "agent:default:work",
     });
     let capturedStore;
     mocks.updateSessionStore.mockImplementation(async (_path, updater) => {
       const store = {
-        "agent:main:work": { sessionId: "existing-session-id", updatedAt: 10 },
-        "agent:main:MAIN": { sessionId: "legacy-session-id", updatedAt: 5 },
+        "agent:default:work": { sessionId: "existing-session-id", updatedAt: 10 },
+        "agent:default:MAIN": { sessionId: "legacy-session-id", updatedAt: 5 },
       };
       await updater(store);
       capturedStore = store;
@@ -239,16 +239,16 @@ describe("gateway agent handler", () => {
     );
     expect(mocks.updateSessionStore).toHaveBeenCalled();
     expect(capturedStore).toBeDefined();
-    expect(capturedStore?.["agent:main:work"]).toBeDefined();
-    expect(capturedStore?.["agent:main:MAIN"]).toBeUndefined();
+    expect(capturedStore?.["agent:default:work"]).toBeDefined();
+    expect(capturedStore?.["agent:default:MAIN"]).toBeUndefined();
   });
   it("handles bare /new by resetting the same session and sending reset greeting prompt", async () => {
     mocks.sessionsResetHandler.mockImplementation(async (opts) => {
-      expect(opts.params.key).toBe("agent:main:main");
+      expect(opts.params.key).toBe("agent:default:main");
       expect(opts.params.reason).toBe("new");
       opts.respond(true, {
         ok: true,
-        key: "agent:main:main",
+        key: "agent:default:main",
         entry: { sessionId: "reset-session-id" },
       });
     });
@@ -259,7 +259,7 @@ describe("gateway agent handler", () => {
         sessionId: "reset-session-id",
         updatedAt: Date.now(),
       },
-      canonicalKey: "agent:main:main",
+      canonicalKey: "agent:default:main",
     });
     mocks.updateSessionStore.mockResolvedValue(undefined);
     mocks.agentCommand.mockResolvedValue({
@@ -269,7 +269,7 @@ describe("gateway agent handler", () => {
     await invokeAgent(
       {
         message: "/new",
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         idempotencyKey: "test-idem-new",
       },
       { reqId: "4" },

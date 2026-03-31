@@ -69,7 +69,7 @@ const mocks = vi.hoisted(() => ({
   resolveAgentWorkspaceDir: vi.fn(() => "/workspace/test-agent"),
   listAgentsForGateway: vi.fn(() => ({
     defaultId: "main",
-    mainKey: "agent:main:main",
+    mainKey: "agent:default:main",
     scope: "global",
     agents: [],
   })),

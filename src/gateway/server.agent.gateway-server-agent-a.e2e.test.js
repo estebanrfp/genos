@@ -176,7 +176,7 @@ describe("gateway server agent", () => {
     setRegistry(defaultRegistry);
     await setTestSessionStore({
       entries: {
-        "agent:main:subagent:abc": {
+        "agent:default:subagent:abc": {
           sessionId: "sess-sub",
           updatedAt: Date.now(),
         },
@@ -184,12 +184,12 @@ describe("gateway server agent", () => {
     });
     const res = await rpcReq(ws, "agent", {
       message: "hi",
-      sessionKey: "agent:main:subagent:abc",
+      sessionKey: "agent:default:subagent:abc",
       idempotencyKey: "idem-agent-subkey",
     });
     expect(res.ok).toBe(true);
     const call = latestAgentCall();
-    expect(call.sessionKey).toBe("agent:main:subagent:abc");
+    expect(call.sessionKey).toBe("agent:default:subagent:abc");
     expect(call.sessionId).toBe("sess-sub");
     expectChannels(call, "webchat");
     expect(call.deliver).toBe(false);
@@ -202,24 +202,24 @@ describe("gateway server agent", () => {
     testState.sessionStorePath = storePath;
     await writeSessionStore({
       entries: {
-        "agent:main:subagent:depth": {
+        "agent:default:subagent:depth": {
           sessionId: "sess-sub-depth",
           updatedAt: Date.now(),
-          spawnedBy: "agent:main:main",
+          spawnedBy: "agent:default:main",
           spawnDepth: 2,
         },
       },
     });
     const res = await rpcReq(ws, "agent", {
       message: "hi",
-      sessionKey: "agent:main:subagent:depth",
+      sessionKey: "agent:default:subagent:depth",
       idempotencyKey: "idem-agent-subdepth",
     });
     expect(res.ok).toBe(true);
     const raw = await fs.readFile(storePath, "utf-8");
     const persisted = JSON.parse(raw);
-    expect(persisted["agent:main:subagent:depth"]?.spawnDepth).toBe(2);
-    expect(persisted["agent:main:subagent:depth"]?.spawnedBy).toBe("agent:main:main");
+    expect(persisted["agent:default:subagent:depth"]?.spawnDepth).toBe(2);
+    expect(persisted["agent:default:subagent:depth"]?.spawnedBy).toBe("agent:default:main");
   });
   test("agent derives sessionKey from agentId", async () => {
     setRegistry(defaultRegistry);
@@ -261,7 +261,7 @@ describe("gateway server agent", () => {
     const res = await rpcReq(ws, "agent", {
       message: "hi",
       agentId: "ops",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       idempotencyKey: "idem-agent-mismatch",
     });
     expect(res.ok).toBe(false);
@@ -375,7 +375,7 @@ describe("gateway server agent", () => {
     });
     expect(res.ok).toBe(true);
     const call = latestAgentCall();
-    expect(call.sessionKey).toBe("agent:main:main");
+    expect(call.sessionKey).toBe("agent:default:main");
     expectChannels(call, "webchat");
     expect(typeof call.message).toBe("string");
     expect(call.message).toContain("what is in the image?");

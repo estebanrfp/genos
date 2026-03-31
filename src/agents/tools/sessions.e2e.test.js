@@ -122,8 +122,8 @@ describe("resolveAnnounceTarget", () => {
   it("derives non-WhatsApp announce targets from the session key", async () => {
     const { resolveAnnounceTarget } = await loadResolveAnnounceTarget();
     const target = await resolveAnnounceTarget({
-      sessionKey: "agent:main:discord:group:dev",
-      displayKey: "agent:main:discord:group:dev",
+      sessionKey: "agent:default:discord:group:dev",
+      displayKey: "agent:default:discord:group:dev",
     });
     expect(target).toEqual({ channel: "discord", to: "channel:dev" });
     expect(callGatewayMock).not.toHaveBeenCalled();
@@ -133,7 +133,7 @@ describe("resolveAnnounceTarget", () => {
     callGatewayMock.mockResolvedValueOnce({
       sessions: [
         {
-          key: "agent:main:whatsapp:group:123@g.us",
+          key: "agent:default:whatsapp:group:123@g.us",
           deliveryContext: {
             channel: "whatsapp",
             to: "123@g.us",
@@ -143,8 +143,8 @@ describe("resolveAnnounceTarget", () => {
       ],
     });
     const target = await resolveAnnounceTarget({
-      sessionKey: "agent:main:whatsapp:group:123@g.us",
-      displayKey: "agent:main:whatsapp:group:123@g.us",
+      sessionKey: "agent:default:whatsapp:group:123@g.us",
+      displayKey: "agent:default:whatsapp:group:123@g.us",
     });
     expect(target).toEqual({
       channel: "whatsapp",
@@ -163,17 +163,17 @@ describe("sessions_list gating", () => {
     callGatewayMock.mockResolvedValue({
       path: "/tmp/sessions.json",
       sessions: [
-        { key: "agent:main:main", kind: "direct" },
+        { key: "agent:default:main", kind: "direct" },
         { key: "agent:other:main", kind: "direct" },
       ],
     });
   });
   it("filters out other agents when tools.agentToAgent.enabled is false", async () => {
-    const tool = createSessionsListTool({ agentSessionKey: "agent:main:main" });
+    const tool = createSessionsListTool({ agentSessionKey: "agent:default:main" });
     const result = await tool.execute("call1", {});
     expect(result.details).toMatchObject({
       count: 1,
-      sessions: [{ key: "agent:main:main" }],
+      sessions: [{ key: "agent:default:main" }],
     });
   });
 });
@@ -183,7 +183,7 @@ describe("sessions_send gating", () => {
   });
   it("blocks cross-agent sends when tools.agentToAgent.enabled is false", async () => {
     const tool = createSessionsSendTool({
-      agentSessionKey: "agent:main:main",
+      agentSessionKey: "agent:default:main",
       agentChannel: "whatsapp",
     });
     const result = await tool.execute("call1", {

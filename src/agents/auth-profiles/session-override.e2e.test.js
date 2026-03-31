@@ -31,14 +31,14 @@ describe("resolveSessionAuthProfileOverride", () => {
         authProfileOverride: "zai:work",
         authProfileOverrideSource: "user",
       };
-      const sessionStore = { "agent:main:main": sessionEntry };
+      const sessionStore = { "agent:default:main": sessionEntry };
       const resolved = await resolveSessionAuthProfileOverride({
         cfg: {},
         provider: "z.ai",
         agentDir,
         sessionEntry,
         sessionStore,
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         storePath: undefined,
         isNewSession: false,
       });

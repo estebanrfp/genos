@@ -24,7 +24,7 @@ const NOW_MS = 1737600000000;
 describe("resolveCronSession", () => {
   it("preserves modelOverride and providerOverride from existing session entry", () => {
     const result = resolveWithStoredEntry({
-      sessionKey: "agent:main:cron:test-job",
+      sessionKey: "agent:default:cron:test-job",
       entry: {
         sessionId: "old-session-id",
         updatedAt: 1000,
@@ -41,7 +41,7 @@ describe("resolveCronSession", () => {
   });
   it("handles missing modelOverride gracefully", () => {
     const result = resolveWithStoredEntry({
-      sessionKey: "agent:main:cron:test-job",
+      sessionKey: "agent:default:cron:test-job",
       entry: {
         sessionId: "old-session-id",
         updatedAt: 1000,
@@ -53,7 +53,7 @@ describe("resolveCronSession", () => {
   });
   it("handles no existing session entry", () => {
     const result = resolveWithStoredEntry({
-      sessionKey: "agent:main:cron:new-job",
+      sessionKey: "agent:default:cron:new-job",
     });
     expect(result.sessionEntry.modelOverride).toBeUndefined();
     expect(result.sessionEntry.providerOverride).toBeUndefined();

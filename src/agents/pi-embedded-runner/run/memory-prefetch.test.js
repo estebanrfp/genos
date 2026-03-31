@@ -200,7 +200,7 @@ describe("prefetchMemoryContext", () => {
 
     expect(mockManager.search).toHaveBeenCalledWith("test", {
       maxResults: 3,
-      sessionKey: "agent:main:direct:prefetch",
+      sessionKey: "agent:default:direct:prefetch",
     });
   });
 
@@ -229,12 +229,12 @@ describe("prefetchMemoryContext", () => {
     await prefetchMemoryContext({
       prompt: "test session routing",
       config: baseConfig,
-      sessionKey: "agent:main:telegram:dm:123",
+      sessionKey: "agent:default:telegram:dm:123",
     });
 
     expect(mockManager.search).toHaveBeenCalledWith("test session routing", {
       maxResults: 5,
-      sessionKey: "agent:main:telegram:dm:123",
+      sessionKey: "agent:default:telegram:dm:123",
     });
   });
 

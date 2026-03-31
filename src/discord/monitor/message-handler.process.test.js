@@ -156,18 +156,18 @@ describe("processDiscordMessage session routing", () => {
         attachments: [],
       },
       messageChannelId: "dm1",
-      baseSessionKey: "agent:main:discord:direct:u1",
+      baseSessionKey: "agent:default:discord:direct:u1",
       route: {
         agentId: "main",
         channel: "discord",
         accountId: "default",
-        sessionKey: "agent:main:discord:direct:u1",
-        mainSessionKey: "agent:main:main",
+        sessionKey: "agent:default:discord:direct:u1",
+        mainSessionKey: "agent:default:main",
       },
     });
     await processDiscordMessage(ctx);
     expect(getLastRouteUpdate()).toEqual({
-      sessionKey: "agent:main:discord:direct:u1",
+      sessionKey: "agent:default:discord:direct:u1",
       channel: "discord",
       to: "user:U1",
       accountId: "default",
@@ -175,18 +175,18 @@ describe("processDiscordMessage session routing", () => {
   });
   it("stores group lastRoute with channel target", async () => {
     const ctx = await createBaseContext({
-      baseSessionKey: "agent:main:discord:channel:c1",
+      baseSessionKey: "agent:default:discord:channel:c1",
       route: {
         agentId: "main",
         channel: "discord",
         accountId: "default",
-        sessionKey: "agent:main:discord:channel:c1",
-        mainSessionKey: "agent:main:main",
+        sessionKey: "agent:default:discord:channel:c1",
+        mainSessionKey: "agent:default:main",
       },
     });
     await processDiscordMessage(ctx);
     expect(getLastRouteUpdate()).toEqual({
-      sessionKey: "agent:main:discord:channel:c1",
+      sessionKey: "agent:default:discord:channel:c1",
       channel: "discord",
       to: "channel:c1",
       accountId: "default",

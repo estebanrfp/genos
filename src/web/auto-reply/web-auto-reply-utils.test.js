@@ -115,7 +115,7 @@ describe("getSessionSnapshot", () => {
     try {
       const root = await fs.mkdtemp(path.join(os.tmpdir(), "genosos-snapshot-"));
       const storePath = path.join(root, "sessions.json");
-      const sessionKey = "agent:main:whatsapp:dm:s1";
+      const sessionKey = "agent:default:whatsapp:dm:s1";
       await saveSessionStore(storePath, {
         [sessionKey]: {
           sessionId: "snapshot-session",

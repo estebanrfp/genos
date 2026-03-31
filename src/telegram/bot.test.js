@@ -565,7 +565,7 @@ describe("createTelegramBot", () => {
     });
     expect(replySpy).toHaveBeenCalledTimes(1);
     const payload = replySpy.mock.calls[0][0];
-    expect(payload.CommandTargetSessionKey).toBe("agent:main:telegram:direct:12345:thread:99");
+    expect(payload.CommandTargetSessionKey).toBe("agent:default:telegram:direct:12345:thread:99");
   });
   it("allows native DM commands for paired users", async () => {
     onSpy.mockReset();

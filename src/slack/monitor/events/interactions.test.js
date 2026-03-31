@@ -880,7 +880,7 @@ describe("registerSlackInteractionEvents", () => {
           previous_view_id: "VPREV900",
           external_id: "deploy-ext-900",
           hash: "view-hash-900",
-          private_metadata: JSON.stringify({ sessionKey: "agent:main:slack:channel:C99" }),
+          private_metadata: JSON.stringify({ sessionKey: "agent:default:slack:channel:C99" }),
           state: {
             values: {
               env_block: {
@@ -909,7 +909,7 @@ describe("registerSlackInteractionEvents", () => {
       viewId: "V900",
       userId: "U900",
       isCleared: true,
-      privateMetadata: JSON.stringify({ sessionKey: "agent:main:slack:channel:C99" }),
+      privateMetadata: JSON.stringify({ sessionKey: "agent:default:slack:channel:C99" }),
       rootViewId: "VROOT900",
       previousViewId: "VPREV900",
       externalId: "deploy-ext-900",
@@ -921,7 +921,7 @@ describe("registerSlackInteractionEvents", () => {
         expect.objectContaining({ actionId: "env_select", selectedValues: ["canary"] }),
       ]),
     );
-    expect(options.sessionKey).toBe("agent:main:slack:channel:C99");
+    expect(options.sessionKey).toBe("agent:default:slack:channel:C99");
   });
 });
 const selectedDateTimeEpoch = 1771632300;

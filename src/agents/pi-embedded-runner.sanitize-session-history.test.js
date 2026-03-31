@@ -90,7 +90,7 @@ describe("sanitizeSessionHistory", () => {
         content: "forwarded instruction",
         provenance: {
           kind: "inter_session",
-          sourceSessionKey: "agent:main:req",
+          sourceSessionKey: "agent:default:req",
           sourceTool: "sessions_send",
         },
       },
@@ -106,7 +106,7 @@ describe("sanitizeSessionHistory", () => {
     expect(first.role).toBe("user");
     expect(typeof first.content).toBe("string");
     expect(first.content).toContain("[Inter-session message]");
-    expect(first.content).toContain("sourceSession=agent:main:req");
+    expect(first.content).toContain("sourceSession=agent:default:req");
   });
   it("keeps reasoning-only assistant messages for openai-responses", async () => {
     vi.mocked(helpers.isGoogleModelApi).mockReturnValue(false);

@@ -177,14 +177,14 @@ describe("genosos-tools: subagents (sessions_spawn lifecycle)", () => {
     const first = agentCalls[0]?.params;
     expect(first?.lane).toBe("subagent");
     expectSingleCompletionSend(ctx.calls, {
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       channel: "whatsapp",
       to: "+123",
       message: `\u2705 Subagent main finished
 
 done`,
     });
-    expect(child.sessionKey?.startsWith("agent:main:subagent:")).toBe(true);
+    expect(child.sessionKey?.startsWith("agent:default:subagent:")).toBe(true);
   });
   it("sessions_spawn runs cleanup via lifecycle events", async () => {
     resetSubagentRegistryForTests();
@@ -236,15 +236,15 @@ done`,
     expect(first?.lane).toBe("subagent");
     expect(first?.deliver).toBe(false);
     expect(first?.channel).toBe("discord");
-    expect(first?.sessionKey?.startsWith("agent:main:subagent:")).toBe(true);
-    expect(child.sessionKey?.startsWith("agent:main:subagent:")).toBe(true);
+    expect(first?.sessionKey?.startsWith("agent:default:subagent:")).toBe(true);
+    expect(child.sessionKey?.startsWith("agent:default:subagent:")).toBe(true);
     expectSingleCompletionSend(ctx.calls, {
-      sessionKey: "agent:main:discord:group:req",
+      sessionKey: "agent:default:discord:group:req",
       channel: "discord",
       to: "discord:dm:u123",
       message: "\u2705 Subagent main finished",
     });
-    expect(deletedKey?.startsWith("agent:main:subagent:")).toBe(true);
+    expect(deletedKey?.startsWith("agent:default:subagent:")).toBe(true);
   });
   it("sessions_spawn deletes session when cleanup=delete via agent.wait", async () => {
     resetSubagentRegistryForTests();
@@ -280,20 +280,20 @@ done`,
     await waitFor(() => Boolean(deletedKey));
     const childWait = ctx.waitCalls.find((call) => call.runId === child.runId);
     expect(childWait?.timeoutMs).toBe(1000);
-    expect(child.sessionKey?.startsWith("agent:main:subagent:")).toBe(true);
+    expect(child.sessionKey?.startsWith("agent:default:subagent:")).toBe(true);
     const agentCalls = ctx.calls.filter((call) => call.method === "agent");
     expect(agentCalls).toHaveLength(1);
     const first = agentCalls[0]?.params;
     expect(first?.lane).toBe("subagent");
     expectSingleCompletionSend(ctx.calls, {
-      sessionKey: "agent:main:discord:group:req",
+      sessionKey: "agent:default:discord:group:req",
       channel: "discord",
       to: "discord:dm:u123",
       message: `\u2705 Subagent main finished
 
 done`,
     });
-    expect(deletedKey?.startsWith("agent:main:subagent:")).toBe(true);
+    expect(deletedKey?.startsWith("agent:default:subagent:")).toBe(true);
   });
   it("sessions_spawn reports timed out when agent.wait returns timeout", async () => {
     resetSubagentRegistryForTests();

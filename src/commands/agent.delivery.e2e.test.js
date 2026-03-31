@@ -165,7 +165,7 @@ describe("deliverAgentCommandResult", () => {
         message: "hello",
         deliver: false,
         lane: "nested",
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         runId: "run-announce",
         messageChannel: "webchat",
       },
@@ -174,7 +174,7 @@ describe("deliverAgentCommandResult", () => {
     expect(runtime.log).toHaveBeenCalledTimes(1);
     const line = String(runtime.log.mock.calls[0]?.[0]);
     expect(line).toContain("[agent:nested]");
-    expect(line).toContain("session=agent:main:main");
+    expect(line).toContain("session=agent:default:main");
     expect(line).toContain("run=run-announce");
     expect(line).toContain("channel=webchat");
     expect(line).toContain("ANNOUNCE_SKIP");

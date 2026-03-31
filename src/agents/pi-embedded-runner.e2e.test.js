@@ -258,7 +258,7 @@ describe("runEmbeddedPiAgent", () => {
     await ensureModels(cfg);
     const result = await runEmbeddedPiAgent({
       sessionId: "session:test-fallback",
-      sessionKey: "agent:main:subagent:fallback-workspace",
+      sessionKey: "agent:default:subagent:fallback-workspace",
       sessionFile,
       workspaceDir: undefined,
       config: cfg,

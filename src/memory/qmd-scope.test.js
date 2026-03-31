@@ -30,17 +30,17 @@ describe("qmd scope", () => {
   it("supports rawKeyPrefix matches for agent-prefixed keys", () => {
     const scope = {
       default: "allow",
-      rules: [{ action: "deny", match: { rawKeyPrefix: "agent:main:discord:" } }],
+      rules: [{ action: "deny", match: { rawKeyPrefix: "agent:default:discord:" } }],
     };
-    expect(isQmdScopeAllowed(scope, "agent:main:discord:channel:c123")).toBe(false);
-    expect(isQmdScopeAllowed(scope, "agent:main:slack:channel:c123")).toBe(true);
+    expect(isQmdScopeAllowed(scope, "agent:default:discord:channel:c123")).toBe(false);
+    expect(isQmdScopeAllowed(scope, "agent:default:slack:channel:c123")).toBe(true);
   });
   it("keeps legacy agent-prefixed keyPrefix rules working", () => {
     const scope = {
       default: "allow",
-      rules: [{ action: "deny", match: { keyPrefix: "agent:main:discord:" } }],
+      rules: [{ action: "deny", match: { keyPrefix: "agent:default:discord:" } }],
     };
-    expect(isQmdScopeAllowed(scope, "agent:main:discord:channel:c123")).toBe(false);
-    expect(isQmdScopeAllowed(scope, "agent:main:slack:channel:c123")).toBe(true);
+    expect(isQmdScopeAllowed(scope, "agent:default:discord:channel:c123")).toBe(false);
+    expect(isQmdScopeAllowed(scope, "agent:default:slack:channel:c123")).toBe(true);
   });
 });

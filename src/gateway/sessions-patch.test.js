@@ -50,8 +50,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", thinkingLevel: "off" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", thinkingLevel: "off" },
     });
     expect(res.ok).toBe(true);
     if (!res.ok) {
@@ -61,13 +61,13 @@ describe("gateway sessions patch", () => {
   });
   test("clears thinkingLevel when patch sets null", async () => {
     const store = {
-      "agent:main:main": { thinkingLevel: "low" },
+      "agent:default:main": { thinkingLevel: "low" },
     };
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", thinkingLevel: null },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", thinkingLevel: null },
     });
     expect(res.ok).toBe(true);
     if (!res.ok) {
@@ -80,8 +80,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", elevatedLevel: "off" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", elevatedLevel: "off" },
     });
     expect(res.ok).toBe(true);
     if (!res.ok) {
@@ -94,8 +94,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", elevatedLevel: "on" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", elevatedLevel: "on" },
     });
     expect(res.ok).toBe(true);
     if (!res.ok) {
@@ -105,13 +105,13 @@ describe("gateway sessions patch", () => {
   });
   test("clears elevatedLevel when patch sets null", async () => {
     const store = {
-      "agent:main:main": { elevatedLevel: "off" },
+      "agent:default:main": { elevatedLevel: "off" },
     };
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", elevatedLevel: null },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", elevatedLevel: null },
     });
     expect(res.ok).toBe(true);
     if (!res.ok) {
@@ -124,8 +124,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", elevatedLevel: "maybe" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", elevatedLevel: "maybe" },
     });
     expect(res.ok).toBe(false);
     if (res.ok) {
@@ -135,7 +135,7 @@ describe("gateway sessions patch", () => {
   });
   test("clears auth overrides when model patch changes", async () => {
     const store = {
-      "agent:main:main": {
+      "agent:default:main": {
         sessionId: "sess",
         updatedAt: 1,
         providerOverride: "anthropic",
@@ -148,8 +148,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", model: "openai/gpt-5.2" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", model: "openai/gpt-5.2" },
       loadGatewayModelCatalog: async () => [{ provider: "openai", id: "gpt-5.2", name: "gpt-5.2" }],
     });
     expect(res.ok).toBe(true);
@@ -167,8 +167,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:subagent:child",
-      patch: { key: "agent:main:subagent:child", spawnDepth: 2 },
+      storeKey: "agent:default:subagent:child",
+      patch: { key: "agent:default:subagent:child", spawnDepth: 2 },
     });
     expect(res.ok).toBe(true);
     if (!res.ok) {
@@ -181,8 +181,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", spawnDepth: 1 },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", spawnDepth: 1 },
     });
     expect(res.ok).toBe(false);
     if (res.ok) {
@@ -195,9 +195,9 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
+      storeKey: "agent:default:main",
       patch: {
-        key: "agent:main:main",
+        key: "agent:default:main",
         execHost: " NODE ",
         execSecurity: " ALLOWLIST ",
         execAsk: " ON-MISS ",
@@ -222,8 +222,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", execHost: "edge" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", execHost: "edge" },
     });
     expect(res.ok).toBe(false);
     if (res.ok) {
@@ -236,8 +236,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", sendPolicy: "ask" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", sendPolicy: "ask" },
     });
     expect(res.ok).toBe(false);
     if (res.ok) {
@@ -250,8 +250,8 @@ describe("gateway sessions patch", () => {
     const res = await applySessionsPatchToStore({
       cfg: {},
       store,
-      storeKey: "agent:main:main",
-      patch: { key: "agent:main:main", groupActivation: "never" },
+      storeKey: "agent:default:main",
+      patch: { key: "agent:default:main", groupActivation: "never" },
     });
     expect(res.ok).toBe(false);
     if (res.ok) {

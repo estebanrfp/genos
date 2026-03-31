@@ -3,30 +3,30 @@ import { getHistoryLimitFromSessionKey, limitHistoryTurns } from "./history.js";
 
 describe("getHistoryLimitFromSessionKey", () => {
   it("returns undefined when no config is provided", () => {
-    expect(getHistoryLimitFromSessionKey("agent:main:telegram:dm:123", null)).toBeUndefined();
+    expect(getHistoryLimitFromSessionKey("agent:default:telegram:dm:123", null)).toBeUndefined();
   });
 
   it("returns channel-specific dmHistoryLimit", () => {
     const config = { channels: { telegram: { dmHistoryLimit: 10 } } };
-    const limit = getHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config);
     expect(limit).toBe(10);
   });
 
   it("returns channel-specific historyLimit for group/channel kind", () => {
     const config = { channels: { discord: { historyLimit: 15 } } };
-    const limit = getHistoryLimitFromSessionKey("agent:main:discord:channel:abc", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:discord:channel:abc", config);
     expect(limit).toBe(15);
   });
 
   it("returns per-user DM historyLimit", () => {
     const config = { channels: { telegram: { dms: { 123: { historyLimit: 5 } } } } };
-    const limit = getHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config);
     expect(limit).toBe(5);
   });
 
   it("falls back to global agents.defaults.historyLimit", () => {
     const config = { agents: { defaults: { historyLimit: 5 } } };
-    const limit = getHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config);
     expect(limit).toBe(5);
   });
 
@@ -35,25 +35,25 @@ describe("getHistoryLimitFromSessionKey", () => {
       agents: { defaults: { historyLimit: 30 } },
       channels: { telegram: { dmHistoryLimit: 10 } },
     };
-    const limit = getHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config);
     expect(limit).toBe(10);
   });
 
   it("returns undefined when no channel config and no global default", () => {
     const config = { channels: {} };
-    const limit = getHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config);
     expect(limit).toBeUndefined();
   });
 
   it("global fallback applies to group/channel kind too", () => {
     const config = { agents: { defaults: { historyLimit: 20 } } };
-    const limit = getHistoryLimitFromSessionKey("agent:main:discord:channel:abc", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:discord:channel:abc", config);
     expect(limit).toBe(20);
   });
 
   it("ignores non-positive global historyLimit", () => {
     const config = { agents: { defaults: { historyLimit: 0 } } };
-    const limit = getHistoryLimitFromSessionKey("agent:main:telegram:dm:123", config);
+    const limit = getHistoryLimitFromSessionKey("agent:default:telegram:dm:123", config);
     expect(limit).toBeUndefined();
   });
 });

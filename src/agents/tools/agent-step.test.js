@@ -19,11 +19,11 @@ describe("readLatestAssistantReply", () => {
         { role: "system", content: [{ type: "text", text: "Compaction" }] },
       ],
     });
-    const result = await readLatestAssistantReply({ sessionKey: "agent:main:child" });
+    const result = await readLatestAssistantReply({ sessionKey: "agent:default:child" });
     expect(result).toBe("All checks passed and changes were pushed.");
     expect(callGatewayMock).toHaveBeenCalledWith({
       method: "chat.history",
-      params: { sessionKey: "agent:main:child", limit: 50 },
+      params: { sessionKey: "agent:default:child", limit: 50 },
     });
   });
   it("falls back to older assistant text when latest assistant has no text", async () => {
@@ -34,7 +34,7 @@ describe("readLatestAssistantReply", () => {
         { role: "system", content: [{ type: "text", text: "Compaction" }] },
       ],
     });
-    const result = await readLatestAssistantReply({ sessionKey: "agent:main:child" });
+    const result = await readLatestAssistantReply({ sessionKey: "agent:default:child" });
     expect(result).toBe("older output");
   });
 });

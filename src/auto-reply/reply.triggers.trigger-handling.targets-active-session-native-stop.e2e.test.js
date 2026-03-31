@@ -24,7 +24,7 @@ describe("trigger handling", () => {
       if (!storePath) {
         throw new Error("missing session store path");
       }
-      const targetSessionKey = "agent:main:telegram:group:123";
+      const targetSessionKey = "agent:default:telegram:group:123";
       const targetSessionId = "session-target";
       await fs.writeFile(
         storePath,

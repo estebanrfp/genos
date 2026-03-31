@@ -13,15 +13,15 @@ describe("cron tool flat-params", () => {
     callGatewayMock.mockResolvedValue({ ok: true });
   });
   it("preserves explicit top-level sessionKey during flat-params recovery", async () => {
-    const tool = createCronTool({ agentSessionKey: "agent:main:discord:channel:ops" });
+    const tool = createCronTool({ agentSessionKey: "agent:default:discord:channel:ops" });
     await tool.execute("call-flat-session-key", {
       action: "add",
-      sessionKey: "agent:main:telegram:group:-100123:topic:99",
+      sessionKey: "agent:default:telegram:group:-100123:topic:99",
       schedule: { kind: "at", at: new Date(123).toISOString() },
       message: "do stuff",
     });
     const call = callGatewayMock.mock.calls[0]?.[0];
     expect(call.method).toBe("cron.add");
-    expect(call.params?.sessionKey).toBe("agent:main:telegram:group:-100123:topic:99");
+    expect(call.params?.sessionKey).toBe("agent:default:telegram:group:-100123:topic:99");
   });
 });

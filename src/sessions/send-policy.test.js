@@ -54,11 +54,11 @@ describe("resolveSendPolicy", () => {
       session: {
         sendPolicy: {
           default: "allow",
-          rules: [{ action: "deny", match: { rawKeyPrefix: "agent:main:discord:" } }],
+          rules: [{ action: "deny", match: { rawKeyPrefix: "agent:default:discord:" } }],
         },
       },
     };
-    expect(resolveSendPolicy({ cfg, sessionKey: "agent:main:discord:group:dev" })).toBe("deny");
-    expect(resolveSendPolicy({ cfg, sessionKey: "agent:main:slack:group:dev" })).toBe("allow");
+    expect(resolveSendPolicy({ cfg, sessionKey: "agent:default:discord:group:dev" })).toBe("deny");
+    expect(resolveSendPolicy({ cfg, sessionKey: "agent:default:slack:group:dev" })).toBe("allow");
   });
 });

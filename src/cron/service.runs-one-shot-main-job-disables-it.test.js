@@ -471,7 +471,7 @@ describe.skip("CronService", () => {
       wakeNowHeartbeatBusyMaxWaitMs: 1,
       wakeNowHeartbeatBusyRetryDelayMs: 2,
     });
-    const sessionKey = "agent:main:discord:channel:ops";
+    const sessionKey = "agent:default:discord:channel:ops";
     const job = await addWakeModeNowMainSystemEventJob(cron, {
       name: "wakeMode now fallback",
       sessionKey,

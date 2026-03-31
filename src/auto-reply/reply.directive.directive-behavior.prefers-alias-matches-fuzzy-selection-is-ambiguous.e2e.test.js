@@ -114,7 +114,7 @@ describe("directive behavior", () => {
       const text = replyText(res);
       expect(text).toContain("Auth profile set to anthropic:work");
       const store = loadSessionStore(storePath);
-      const entry = store["agent:main:main"];
+      const entry = store["agent:default:main"];
       expect(entry.authProfileOverride).toBe("anthropic:work");
       expect(runEmbeddedPiAgent).not.toHaveBeenCalled();
     });

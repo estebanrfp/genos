@@ -418,7 +418,7 @@ describe("buildAgentSystemPrompt", () => {
 describe("buildSubagentSystemPrompt", () => {
   it("includes sub-agent spawning guidance for depth-1 orchestrator when maxSpawnDepth >= 2", () => {
     const prompt = buildSubagentSystemPrompt({
-      childSessionKey: "agent:main:subagent:abc",
+      childSessionKey: "agent:default:subagent:abc",
       task: "research task",
       childDepth: 1,
       maxSpawnDepth: 2,
@@ -432,7 +432,7 @@ describe("buildSubagentSystemPrompt", () => {
   });
   it("does not include spawning guidance for depth-1 leaf when maxSpawnDepth == 1", () => {
     const prompt = buildSubagentSystemPrompt({
-      childSessionKey: "agent:main:subagent:abc",
+      childSessionKey: "agent:default:subagent:abc",
       task: "research task",
       childDepth: 1,
       maxSpawnDepth: 1,
@@ -442,7 +442,7 @@ describe("buildSubagentSystemPrompt", () => {
   });
   it("includes leaf worker note for depth-2 sub-sub-agents", () => {
     const prompt = buildSubagentSystemPrompt({
-      childSessionKey: "agent:main:subagent:abc:subagent:def",
+      childSessionKey: "agent:default:subagent:abc:subagent:def",
       task: "leaf task",
       childDepth: 2,
       maxSpawnDepth: 2,
@@ -453,7 +453,7 @@ describe("buildSubagentSystemPrompt", () => {
   });
   it("uses 'parent orchestrator' label for depth-2 agents", () => {
     const prompt = buildSubagentSystemPrompt({
-      childSessionKey: "agent:main:subagent:abc:subagent:def",
+      childSessionKey: "agent:default:subagent:abc:subagent:def",
       task: "leaf task",
       childDepth: 2,
       maxSpawnDepth: 2,
@@ -463,7 +463,7 @@ describe("buildSubagentSystemPrompt", () => {
   });
   it("uses 'main agent' label for depth-1 agents", () => {
     const prompt = buildSubagentSystemPrompt({
-      childSessionKey: "agent:main:subagent:abc",
+      childSessionKey: "agent:default:subagent:abc",
       task: "orchestrator task",
       childDepth: 1,
       maxSpawnDepth: 2,
@@ -473,7 +473,7 @@ describe("buildSubagentSystemPrompt", () => {
   });
   it("includes recovery guidance for compacted/truncated tool output", () => {
     const prompt = buildSubagentSystemPrompt({
-      childSessionKey: "agent:main:subagent:abc",
+      childSessionKey: "agent:default:subagent:abc",
       task: "investigate logs",
       childDepth: 1,
       maxSpawnDepth: 2,
@@ -485,7 +485,7 @@ describe("buildSubagentSystemPrompt", () => {
   });
   it("defaults to depth 1 and maxSpawnDepth 1 when not provided", () => {
     const prompt = buildSubagentSystemPrompt({
-      childSessionKey: "agent:main:subagent:abc",
+      childSessionKey: "agent:default:subagent:abc",
       task: "basic task",
     });
     expect(prompt).not.toContain("## Sub-Agent Spawning");

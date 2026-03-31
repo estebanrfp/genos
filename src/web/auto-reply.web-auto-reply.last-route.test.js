@@ -70,7 +70,7 @@ describe("web auto-reply last-route", () => {
   installWebAutoReplyUnitTestHooks();
   it("updates last-route for direct chats without senderE164", async () => {
     const now = Date.now();
-    const mainSessionKey = "agent:main:main";
+    const mainSessionKey = "agent:default:main";
     const store = await makeSessionStore({
       [mainSessionKey]: { sessionId: "sid", updatedAt: now - 1 },
     });
@@ -93,7 +93,7 @@ describe("web auto-reply last-route", () => {
   });
   it("updates last-route for group chats with account id", async () => {
     const now = Date.now();
-    const groupSessionKey = "agent:main:whatsapp:group:123@g.us";
+    const groupSessionKey = "agent:default:whatsapp:group:123@g.us";
     const store = await makeSessionStore({
       [groupSessionKey]: { sessionId: "sid", updatedAt: now - 1 },
     });

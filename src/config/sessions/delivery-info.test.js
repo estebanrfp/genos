@@ -22,16 +22,16 @@ beforeEach(() => {
 });
 describe("extractDeliveryInfo", () => {
   it("parses base session and thread/topic ids", () => {
-    expect(parseSessionThreadInfo("agent:main:telegram:group:1:topic:55")).toEqual({
-      baseSessionKey: "agent:main:telegram:group:1",
+    expect(parseSessionThreadInfo("agent:default:telegram:group:1:topic:55")).toEqual({
+      baseSessionKey: "agent:default:telegram:group:1",
       threadId: "55",
     });
-    expect(parseSessionThreadInfo("agent:main:slack:channel:C1:thread:123.456")).toEqual({
-      baseSessionKey: "agent:main:slack:channel:C1",
+    expect(parseSessionThreadInfo("agent:default:slack:channel:C1:thread:123.456")).toEqual({
+      baseSessionKey: "agent:default:slack:channel:C1",
       threadId: "123.456",
     });
-    expect(parseSessionThreadInfo("agent:main:telegram:dm:user-1")).toEqual({
-      baseSessionKey: "agent:main:telegram:dm:user-1",
+    expect(parseSessionThreadInfo("agent:default:telegram:dm:user-1")).toEqual({
+      baseSessionKey: "agent:default:telegram:dm:user-1",
       threadId: undefined,
     });
     expect(parseSessionThreadInfo(undefined)).toEqual({
@@ -40,7 +40,7 @@ describe("extractDeliveryInfo", () => {
     });
   });
   it("returns deliveryContext for direct session keys", () => {
-    const sessionKey = "agent:main:webchat:dm:user-123";
+    const sessionKey = "agent:default:webchat:dm:user-123";
     storeState.store[sessionKey] = buildEntry({
       channel: "webchat",
       to: "webchat:user-123",
@@ -57,7 +57,7 @@ describe("extractDeliveryInfo", () => {
     });
   });
   it("falls back to base sessions for :thread: keys", () => {
-    const baseKey = "agent:main:slack:channel:C0123ABC";
+    const baseKey = "agent:default:slack:channel:C0123ABC";
     const threadKey = `${baseKey}:thread:1234567890.123456`;
     storeState.store[baseKey] = buildEntry({
       channel: "slack",
@@ -75,7 +75,7 @@ describe("extractDeliveryInfo", () => {
     });
   });
   it("falls back to base sessions for :topic: keys", () => {
-    const baseKey = "agent:main:telegram:group:98765";
+    const baseKey = "agent:default:telegram:group:98765";
     const topicKey = `${baseKey}:topic:55`;
     storeState.store[baseKey] = buildEntry({
       channel: "telegram",

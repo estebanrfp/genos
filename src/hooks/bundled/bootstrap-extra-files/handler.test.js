@@ -48,10 +48,10 @@ describe("bootstrap-extra-files hook", () => {
     const context = await createBootstrapContext({
       workspaceDir: tempDir,
       cfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       rootFiles: [{ name: "AGENTS.md", content: "root agents" }],
     });
-    const event = createHookEvent("agent", "bootstrap", "agent:main:main", context);
+    const event = createHookEvent("agent", "bootstrap", "agent:default:main", context);
     await handler(event);
     const injected = context.bootstrapFiles.filter((f) => f.name === "AGENTS.md");
     expect(injected).toHaveLength(2);
@@ -68,13 +68,13 @@ describe("bootstrap-extra-files hook", () => {
     const context = await createBootstrapContext({
       workspaceDir: tempDir,
       cfg,
-      sessionKey: "agent:main:subagent:abc",
+      sessionKey: "agent:default:subagent:abc",
       rootFiles: [
         { name: "AGENTS.md", content: "root agents" },
         { name: "TOOLS.md", content: "root tools" },
       ],
     });
-    const event = createHookEvent("agent", "bootstrap", "agent:main:subagent:abc", context);
+    const event = createHookEvent("agent", "bootstrap", "agent:default:subagent:abc", context);
     await handler(event);
     expect(context.bootstrapFiles.map((f) => f.name).toSorted()).toEqual(["AGENTS.md"]);
   });

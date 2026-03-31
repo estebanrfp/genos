@@ -36,7 +36,7 @@ describe("trigger handling", () => {
       const text = Array.isArray(res) ? res[0]?.text : res?.text;
       expect(text).toContain("Elevated mode disabled.");
       const store = loadSessionStore(requireSessionStorePath(cfg));
-      expect(store["agent:main:whatsapp:group:123@g.us"]?.elevatedLevel).toBe("off");
+      expect(store["agent:default:whatsapp:group:123@g.us"]?.elevatedLevel).toBe("off");
     });
   });
   it("allows elevated directive in groups when mentioned", async () => {
@@ -60,7 +60,7 @@ describe("trigger handling", () => {
       expect(text).toContain("Elevated mode set to ask");
       const storeRaw = await fs.readFile(requireSessionStorePath(cfg), "utf-8");
       const store = JSON.parse(storeRaw);
-      expect(store["agent:main:whatsapp:group:123@g.us"]?.elevatedLevel).toBe("on");
+      expect(store["agent:default:whatsapp:group:123@g.us"]?.elevatedLevel).toBe("on");
     });
   });
   it("allows elevated directive in direct chats without mentions", async () => {

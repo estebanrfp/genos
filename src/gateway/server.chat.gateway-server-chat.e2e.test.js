@@ -100,14 +100,14 @@ describe("gateway server chat", () => {
       spy.mockClear();
       const callsBeforeSession = spyCalls.length;
       const sessionRes = await rpcReq(ws, "chat.send", {
-        sessionKey: "agent:main:subagent:abc",
+        sessionKey: "agent:default:subagent:abc",
         message: "hello",
         idempotencyKey: "idem-session-key-1",
       });
       expect(sessionRes.ok).toBe(true);
       await waitFor(() => spyCalls.length > callsBeforeSession);
       const sessionCall = spyCalls.at(-1)?.[0];
-      expect(sessionCall?.SessionKey).toBe("agent:main:subagent:abc");
+      expect(sessionCall?.SessionKey).toBe("agent:default:subagent:abc");
       const sendPolicyDir = await fs.mkdtemp(path.join(os.tmpdir(), "genosos-gw-"));
       tempDirs.push(sendPolicyDir);
       testState.sessionStorePath = path.join(sendPolicyDir, "sessions.json");

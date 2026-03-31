@@ -128,16 +128,16 @@ describe("/subagents spawn command", () => {
     spawnSubagentDirectMock.mockResolvedValue(acceptedResult());
     const params = buildCommandTestParams("/subagents spawn beta do the thing", baseCfg, {
       CommandSource: "native",
-      CommandTargetSessionKey: "agent:main:main",
+      CommandTargetSessionKey: "agent:default:main",
       OriginatingChannel: "discord",
       OriginatingTo: "channel:12345",
     });
-    params.sessionKey = "agent:main:slack:slash:u1";
+    params.sessionKey = "agent:default:slack:slash:u1";
     const result = await handleSubagentsCommand(params, true);
     expect(result).not.toBeNull();
     expect(result?.reply?.text).toContain("Spawned subagent beta");
     const [, spawnCtx] = spawnSubagentDirectMock.mock.calls[0];
-    expect(spawnCtx.agentSessionKey).toBe("agent:main:main");
+    expect(spawnCtx.agentSessionKey).toBe("agent:default:main");
     expect(spawnCtx.agentChannel).toBe("discord");
     expect(spawnCtx.agentTo).toBe("channel:12345");
   });

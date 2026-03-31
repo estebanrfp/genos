@@ -76,8 +76,8 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "work" },
     };
-    expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:main:work");
-    expect(resolveSessionStoreKey({ cfg, sessionKey: "thread-1" })).toBe("agent:main:thread-1");
+    expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:default:work");
+    expect(resolveSessionStoreKey({ cfg, sessionKey: "thread-1" })).toBe("agent:default:thread-1");
   });
   test("resolveSessionStoreKey normalizes session key casing", () => {
     const cfg = {
@@ -317,19 +317,19 @@ describe("listSessionsFromStore search", () => {
     agents: { list: [{ id: "main", default: true }] },
   };
   const makeStore = () => ({
-    "agent:main:work-project": {
+    "agent:default:work-project": {
       sessionId: "sess-work-1",
       updatedAt: Date.now(),
       displayName: "Work Project Alpha",
       label: "work",
     },
-    "agent:main:personal-chat": {
+    "agent:default:personal-chat": {
       sessionId: "sess-personal-1",
       updatedAt: Date.now() - 1000,
       displayName: "Personal Chat",
       subject: "Family Reunion Planning",
     },
-    "agent:main:discord:group:dev-team": {
+    "agent:default:discord:group:dev-team": {
       sessionId: "sess-discord-1",
       updatedAt: Date.now() - 2000,
       label: "discord",
@@ -409,7 +409,7 @@ describe("listSessionsFromStore search", () => {
       opts: { search: "dev-team" },
     });
     expect(result.sessions.length).toBe(1);
-    expect(result.sessions[0].key).toBe("agent:main:discord:group:dev-team");
+    expect(result.sessions[0].key).toBe("agent:default:discord:group:dev-team");
   });
   test("returns empty array when no matches", () => {
     const store = makeStore();
@@ -445,12 +445,12 @@ describe("listSessionsFromStore search", () => {
   test("hides cron run alias session keys from sessions list", () => {
     const now = Date.now();
     const store = {
-      "agent:main:cron:job-1": {
+      "agent:default:cron:job-1": {
         sessionId: "run-abc",
         updatedAt: now,
         label: "Cron: job-1",
       },
-      "agent:main:cron:job-1:run:run-abc": {
+      "agent:default:cron:job-1:run:run-abc": {
         sessionId: "run-abc",
         updatedAt: now,
         label: "Cron: job-1",
@@ -462,24 +462,24 @@ describe("listSessionsFromStore search", () => {
       store,
       opts: {},
     });
-    expect(result.sessions.map((session) => session.key)).toEqual(["agent:main:cron:job-1"]);
+    expect(result.sessions.map((session) => session.key)).toEqual(["agent:default:cron:job-1"]);
   });
   test("exposes unknown totals when freshness is stale or missing", () => {
     const now = Date.now();
     const store = {
-      "agent:main:fresh": {
+      "agent:default:fresh": {
         sessionId: "sess-fresh",
         updatedAt: now,
         totalTokens: 1200,
         totalTokensFresh: true,
       },
-      "agent:main:stale": {
+      "agent:default:stale": {
         sessionId: "sess-stale",
         updatedAt: now - 1000,
         totalTokens: 2200,
         totalTokensFresh: false,
       },
-      "agent:main:missing": {
+      "agent:default:missing": {
         sessionId: "sess-missing",
         updatedAt: now - 2000,
         inputTokens: 100,
@@ -492,9 +492,9 @@ describe("listSessionsFromStore search", () => {
       store,
       opts: {},
     });
-    const fresh = result.sessions.find((row) => row.key === "agent:main:fresh");
-    const stale = result.sessions.find((row) => row.key === "agent:main:stale");
-    const missing = result.sessions.find((row) => row.key === "agent:main:missing");
+    const fresh = result.sessions.find((row) => row.key === "agent:default:fresh");
+    const stale = result.sessions.find((row) => row.key === "agent:default:stale");
+    const missing = result.sessions.find((row) => row.key === "agent:default:missing");
     expect(fresh?.totalTokens).toBe(1200);
     expect(fresh?.totalTokensFresh).toBe(true);
     expect(stale?.totalTokens).toBeUndefined();

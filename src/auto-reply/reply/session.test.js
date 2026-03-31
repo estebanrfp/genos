@@ -67,7 +67,7 @@ describe("initSessionState thread forking", () => {
       "utf-8",
     );
     const storePath = path.join(root, "sessions.json");
-    const parentSessionKey = "agent:main:slack:channel:c1";
+    const parentSessionKey = "agent:default:slack:channel:c1";
     await saveSessionStore(storePath, {
       [parentSessionKey]: {
         sessionId: parentSessionId,
@@ -78,7 +78,7 @@ describe("initSessionState thread forking", () => {
     const cfg = {
       session: { store: storePath },
     };
-    const threadSessionKey = "agent:main:slack:channel:c1:thread:123";
+    const threadSessionKey = "agent:default:slack:channel:c1:thread:123";
     const threadLabel = "Slack thread #general: starter";
     const result = await initSessionState({
       ctx: {
@@ -114,7 +114,7 @@ describe("initSessionState thread forking", () => {
     const result = await initSessionState({
       ctx: {
         Body: "Hello topic",
-        SessionKey: "agent:main:telegram:group:123:topic:456",
+        SessionKey: "agent:default:telegram:group:123:topic:456",
         MessageThreadId: 456,
       },
       cfg,
@@ -136,7 +136,7 @@ describe("initSessionState RawBody", () => {
       Body: `[Chat messages since your last reply - for context]\n[WhatsApp ...] Someone: hello\n\n[Current message - respond to this]\n[WhatsApp ...] Jake: /status\n[from: Jake McInteer (+6421807830)]`,
       RawBody: "/status",
       ChatType: "group",
-      SessionKey: "agent:main:whatsapp:group:g1",
+      SessionKey: "agent:default:whatsapp:group:g1",
     };
     const result = await initSessionState({
       ctx: groupMessageCtx,
@@ -153,7 +153,7 @@ describe("initSessionState RawBody", () => {
       Body: `[Context]\nJake: /new\n[from: Jake]`,
       RawBody: "/new",
       ChatType: "group",
-      SessionKey: "agent:main:whatsapp:group:g1",
+      SessionKey: "agent:default:whatsapp:group:g1",
     };
     const result = await initSessionState({
       ctx: groupMessageCtx,
@@ -175,7 +175,7 @@ describe("initSessionState RawBody", () => {
     const ctx = {
       RawBody: "/NEW KeepThisCase",
       ChatType: "direct",
-      SessionKey: "agent:main:whatsapp:dm:s1",
+      SessionKey: "agent:default:whatsapp:dm:s1",
     };
     const result = await initSessionState({
       ctx,
@@ -192,7 +192,7 @@ describe("initSessionState RawBody", () => {
     const cfg = { session: { store: storePath } };
     const ctx = {
       Body: "/status",
-      SessionKey: "agent:main:whatsapp:dm:s1",
+      SessionKey: "agent:default:whatsapp:dm:s1",
     };
     const result = await initSessionState({
       ctx,
@@ -250,7 +250,7 @@ describe("initSessionState reset policy", () => {
     vi.setSystemTime(new Date(2026, 0, 18, 5, 0, 0));
     const root = await makeCaseDir("genosos-reset-daily-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:whatsapp:dm:s1";
+    const sessionKey = "agent:default:whatsapp:dm:s1";
     const existingSessionId = "daily-session-id";
     await saveSessionStore(storePath, {
       [sessionKey]: {
@@ -271,7 +271,7 @@ describe("initSessionState reset policy", () => {
     vi.setSystemTime(new Date(2026, 0, 18, 3, 0, 0));
     const root = await makeCaseDir("genosos-reset-daily-edge-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:whatsapp:dm:s-edge";
+    const sessionKey = "agent:default:whatsapp:dm:s-edge";
     const existingSessionId = "daily-edge-session";
     await saveSessionStore(storePath, {
       [sessionKey]: {
@@ -292,7 +292,7 @@ describe("initSessionState reset policy", () => {
     vi.setSystemTime(new Date(2026, 0, 18, 5, 30, 0));
     const root = await makeCaseDir("genosos-reset-idle-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:whatsapp:dm:s2";
+    const sessionKey = "agent:default:whatsapp:dm:s2";
     const existingSessionId = "idle-session-id";
     await saveSessionStore(storePath, {
       [sessionKey]: {
@@ -318,7 +318,7 @@ describe("initSessionState reset policy", () => {
     vi.setSystemTime(new Date(2026, 0, 18, 5, 0, 0));
     const root = await makeCaseDir("genosos-reset-thread-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:slack:channel:c1:thread:123";
+    const sessionKey = "agent:default:slack:channel:c1:thread:123";
     const existingSessionId = "thread-session-id";
     await saveSessionStore(storePath, {
       [sessionKey]: {
@@ -345,7 +345,7 @@ describe("initSessionState reset policy", () => {
     vi.setSystemTime(new Date(2026, 0, 18, 5, 0, 0));
     const root = await makeCaseDir("genosos-reset-thread-nosuffix-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:discord:channel:c1";
+    const sessionKey = "agent:default:discord:channel:c1";
     const existingSessionId = "thread-nosuffix";
     await saveSessionStore(storePath, {
       [sessionKey]: {
@@ -371,7 +371,7 @@ describe("initSessionState reset policy", () => {
     vi.setSystemTime(new Date(2026, 0, 18, 5, 0, 0));
     const root = await makeCaseDir("genosos-reset-type-default-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:whatsapp:dm:s4";
+    const sessionKey = "agent:default:whatsapp:dm:s4";
     const existingSessionId = "type-default-session";
     await saveSessionStore(storePath, {
       [sessionKey]: {
@@ -397,7 +397,7 @@ describe("initSessionState reset policy", () => {
     vi.setSystemTime(new Date(2026, 0, 18, 5, 0, 0));
     const root = await makeCaseDir("genosos-reset-legacy-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:whatsapp:dm:s3";
+    const sessionKey = "agent:default:whatsapp:dm:s3";
     const existingSessionId = "legacy-session-id";
     await saveSessionStore(storePath, {
       [sessionKey]: {
@@ -424,7 +424,7 @@ describe("initSessionState channel reset overrides", () => {
   it("uses channel-specific reset policy when configured", async () => {
     const root = await makeCaseDir("genosos-channel-idle-");
     const storePath = path.join(root, "sessions.json");
-    const sessionKey = "agent:main:discord:dm:123";
+    const sessionKey = "agent:default:discord:dm:123";
     const sessionId = "session-override";
     const updatedAt = Date.now() - 604740000;
     await saveSessionStore(storePath, {
@@ -476,7 +476,7 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
   }
   it("Reset trigger /new works for authorized sender in WhatsApp group", async () => {
     const storePath = await createStorePath("genosos-group-reset-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
+    const sessionKey = "agent:default:whatsapp:group:120363406150318674@g.us";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -513,7 +513,7 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
   });
   it("Reset trigger /new blocked for unauthorized sender in existing session", async () => {
     const storePath = await createStorePath("genosos-group-reset-unauth-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
+    const sessionKey = "agent:default:whatsapp:group:120363406150318674@g.us";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -549,7 +549,7 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
   });
   it("Reset trigger works when RawBody is clean but Body has wrapped context", async () => {
     const storePath = await createStorePath("genosos-group-rawbody-");
-    const sessionKey = "agent:main:whatsapp:group:g1";
+    const sessionKey = "agent:default:whatsapp:group:g1";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -583,7 +583,7 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
   });
   it("Reset trigger /new works when SenderId is LID but SenderE164 is authorized", async () => {
     const storePath = await createStorePath("genosos-group-reset-lid-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
+    const sessionKey = "agent:default:whatsapp:group:120363406150318674@g.us";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -620,7 +620,7 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
   });
   it("Reset trigger /new blocked when SenderId is LID but SenderE164 is unauthorized", async () => {
     const storePath = await createStorePath("genosos-group-reset-lid-unauth-");
-    const sessionKey = "agent:main:whatsapp:group:120363406150318674@g.us";
+    const sessionKey = "agent:default:whatsapp:group:120363406150318674@g.us";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -666,7 +666,7 @@ describe("initSessionState reset triggers in Slack channels", () => {
   }
   it("Reset trigger /reset works when Slack message has a leading <@...> mention token", async () => {
     const storePath = await createStorePath("genosos-slack-channel-reset-");
-    const sessionKey = "agent:main:slack:channel:c1";
+    const sessionKey = "agent:default:slack:channel:c1";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -701,7 +701,7 @@ describe("initSessionState reset triggers in Slack channels", () => {
   });
   it("Reset trigger /new preserves args when Slack message has a leading <@...> mention token", async () => {
     const storePath = await createStorePath("genosos-slack-channel-new-");
-    const sessionKey = "agent:main:slack:channel:c2";
+    const sessionKey = "agent:default:slack:channel:c2";
     const existingSessionId = "existing-session-123";
     await seedSessionStore({
       storePath,
@@ -743,7 +743,7 @@ describe("applyResetModelOverride", () => {
       sessionId: "s1",
       updatedAt: Date.now(),
     };
-    const sessionStore = { "agent:main:dm:1": sessionEntry };
+    const sessionStore = { "agent:default:dm:1": sessionEntry };
     const sessionCtx = { BodyStripped: "minimax summarize" };
     const ctx = { ChatType: "direct" };
     await applyResetModelOverride({
@@ -754,7 +754,7 @@ describe("applyResetModelOverride", () => {
       ctx,
       sessionEntry,
       sessionStore,
-      sessionKey: "agent:main:dm:1",
+      sessionKey: "agent:default:dm:1",
       defaultProvider: "openai",
       defaultModel: "gpt-4o-mini",
       aliasIndex,
@@ -773,7 +773,7 @@ describe("applyResetModelOverride", () => {
       authProfileOverrideSource: "user",
       authProfileOverrideCompactionCount: 2,
     };
-    const sessionStore = { "agent:main:dm:1": sessionEntry };
+    const sessionStore = { "agent:default:dm:1": sessionEntry };
     const sessionCtx = { BodyStripped: "minimax summarize" };
     const ctx = { ChatType: "direct" };
     await applyResetModelOverride({
@@ -784,7 +784,7 @@ describe("applyResetModelOverride", () => {
       ctx,
       sessionEntry,
       sessionStore,
-      sessionKey: "agent:main:dm:1",
+      sessionKey: "agent:default:dm:1",
       defaultProvider: "openai",
       defaultModel: "gpt-4o-mini",
       aliasIndex,
@@ -800,7 +800,7 @@ describe("applyResetModelOverride", () => {
       sessionId: "s1",
       updatedAt: Date.now(),
     };
-    const sessionStore = { "agent:main:dm:1": sessionEntry };
+    const sessionStore = { "agent:default:dm:1": sessionEntry };
     const sessionCtx = { BodyStripped: "minimax summarize" };
     const ctx = { ChatType: "direct" };
     await applyResetModelOverride({
@@ -811,7 +811,7 @@ describe("applyResetModelOverride", () => {
       ctx,
       sessionEntry,
       sessionStore,
-      sessionKey: "agent:main:dm:1",
+      sessionKey: "agent:default:dm:1",
       defaultProvider: "openai",
       defaultModel: "gpt-4o-mini",
       aliasIndex,
@@ -833,7 +833,7 @@ describe("initSessionState preserves behavior overrides across /new and /reset",
   }
   it("/new preserves verboseLevel from previous session", async () => {
     const storePath = await createStorePath("genosos-reset-verbose-");
-    const sessionKey = "agent:main:telegram:dm:user1";
+    const sessionKey = "agent:default:telegram:dm:user1";
     const existingSessionId = "existing-session-verbose";
     await seedSessionStoreWithOverrides({
       storePath,
@@ -871,7 +871,7 @@ describe("initSessionState preserves behavior overrides across /new and /reset",
   });
   it("/reset preserves thinkingLevel and reasoningLevel from previous session", async () => {
     const storePath = await createStorePath("genosos-reset-thinking-");
-    const sessionKey = "agent:main:telegram:dm:user2";
+    const sessionKey = "agent:default:telegram:dm:user2";
     const existingSessionId = "existing-session-thinking";
     await seedSessionStoreWithOverrides({
       storePath,
@@ -905,7 +905,7 @@ describe("initSessionState preserves behavior overrides across /new and /reset",
   });
   it("/new in a new session does not preserve overrides", async () => {
     const storePath = await createStorePath("genosos-new-no-preserve-");
-    const sessionKey = "agent:main:telegram:dm:user3";
+    const sessionKey = "agent:default:telegram:dm:user3";
     const cfg = {
       session: { store: storePath, idleMinutes: 999 },
     };
@@ -931,7 +931,7 @@ describe("initSessionState preserves behavior overrides across /new and /reset",
   });
   it("archives the old session store entry on /new", async () => {
     const storePath = await createStorePath("genosos-archive-old-");
-    const sessionKey = "agent:main:telegram:dm:user-archive";
+    const sessionKey = "agent:default:telegram:dm:user-archive";
     const existingSessionId = "existing-session-archive";
     await seedSessionStoreWithOverrides({
       storePath,
@@ -972,7 +972,7 @@ describe("initSessionState preserves behavior overrides across /new and /reset",
   });
   it("idle-based new session does NOT preserve overrides (no entry to read)", async () => {
     const storePath = await createStorePath("genosos-idle-no-preserve-");
-    const sessionKey = "agent:main:telegram:dm:new-user";
+    const sessionKey = "agent:default:telegram:dm:new-user";
     const cfg = {
       session: { store: storePath, idleMinutes: 0 },
     };
@@ -1004,10 +1004,10 @@ describe("prependSystemEvents", () => {
       const timestamp = new Date("2026-01-12T20:19:17Z");
       const expectedTimestamp = formatZonedTimestamp(timestamp, { displaySeconds: true });
       vi.setSystemTime(timestamp);
-      enqueueSystemEvent("Model switched.", { sessionKey: "agent:main:main" });
+      enqueueSystemEvent("Model switched.", { sessionKey: "agent:default:main" });
       const result = await prependSystemEvents({
         cfg: {},
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         isMainSession: false,
         isNewSession: false,
         prefixedBodyBase: "User: hi",
@@ -1120,7 +1120,7 @@ describe("initSessionState stale threadId fallback", () => {
   }
   it("ignores persisted lastThreadId on main sessions for non-thread messages", async () => {
     const storePath = await createStorePath("stale-main-thread-");
-    const sessionKey = "agent:main:main";
+    const sessionKey = "agent:default:main";
     await seedSessionStore({
       storePath,
       sessionKey,
@@ -1155,7 +1155,7 @@ describe("initSessionState stale threadId fallback", () => {
     const threadResult = await initSessionState({
       ctx: {
         Body: "hello from topic",
-        SessionKey: "agent:main:main:thread:42",
+        SessionKey: "agent:default:main:thread:42",
         MessageThreadId: 42,
       },
       cfg,
@@ -1165,7 +1165,7 @@ describe("initSessionState stale threadId fallback", () => {
     const mainResult = await initSessionState({
       ctx: {
         Body: "hello from DM",
-        SessionKey: "agent:main:main",
+        SessionKey: "agent:default:main",
       },
       cfg,
       commandAuthorized: true,
@@ -1178,7 +1178,7 @@ describe("initSessionState stale threadId fallback", () => {
     await initSessionState({
       ctx: {
         Body: "first",
-        SessionKey: "agent:main:main:thread:99",
+        SessionKey: "agent:default:main:thread:99",
         MessageThreadId: 99,
       },
       cfg,
@@ -1187,7 +1187,7 @@ describe("initSessionState stale threadId fallback", () => {
     const result = await initSessionState({
       ctx: {
         Body: "second",
-        SessionKey: "agent:main:main:thread:99",
+        SessionKey: "agent:default:main:thread:99",
         MessageThreadId: 99,
       },
       cfg,

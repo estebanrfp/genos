@@ -24,7 +24,7 @@ let buildCtx = function () {
 };
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const buildSessionLookup = (sessionKey, entry = {}) => ({
-  cfg: { session: { mainKey: "agent:main:main" } },
+  cfg: { session: { mainKey: "agent:default:main" } },
   storePath: "/tmp/sessions.json",
   store: {},
   entry: {
@@ -46,7 +46,7 @@ vi.mock("../commands/agent.js", () => ({
   agentCommand: vi.fn(),
 }));
 vi.mock("../config/config.js", () => ({
-  loadConfig: vi.fn(() => ({ session: { mainKey: "agent:main:main" } })),
+  loadConfig: vi.fn(() => ({ session: { mainKey: "agent:default:main" } })),
   STATE_DIR: "/tmp/genosos-state",
 }));
 vi.mock("../config/sessions.js", () => ({
@@ -81,14 +81,14 @@ describe("node exec events", () => {
     await handleNodeEvent(ctx, "node-1", {
       event: "exec.started",
       payloadJSON: JSON.stringify({
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         runId: "run-1",
         command: "ls -la",
       }),
     });
     expect(enqueueSystemEventMock).toHaveBeenCalledWith(
       "Exec started (node=node-1 id=run-1): ls -la",
-      { sessionKey: "agent:main:main", contextKey: "exec:run-1" },
+      { sessionKey: "agent:default:main", contextKey: "exec:run-1" },
     );
     expect(requestHeartbeatNowMock).toHaveBeenCalledWith({ reason: "exec-event" });
   });
@@ -267,7 +267,7 @@ describe("agent request events", () => {
       event: "agent.request",
       payloadJSON: JSON.stringify({
         message: "summarize this",
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         deliver: true,
       }),
     });
@@ -275,7 +275,7 @@ describe("agent request events", () => {
     const [opts] = agentCommandMock.mock.calls[0] ?? [];
     expect(opts).toMatchObject({
       message: "summarize this",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       deliver: false,
       channel: undefined,
       to: undefined,
@@ -287,18 +287,18 @@ describe("agent request events", () => {
   it("reuses the current session route when delivery target is omitted", async () => {
     const ctx = buildCtx();
     loadSessionEntryMock.mockReturnValueOnce({
-      ...buildSessionLookup("agent:main:main", {
+      ...buildSessionLookup("agent:default:main", {
         sessionId: "sid-current",
         lastChannel: "telegram",
         lastTo: "123",
       }),
-      canonicalKey: "agent:main:main",
+      canonicalKey: "agent:default:main",
     });
     await handleNodeEvent(ctx, "node-route-hit", {
       event: "agent.request",
       payloadJSON: JSON.stringify({
         message: "route on session",
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:default:main",
         deliver: true,
       }),
     });
@@ -306,7 +306,7 @@ describe("agent request events", () => {
     const [opts] = agentCommandMock.mock.calls[0] ?? [];
     expect(opts).toMatchObject({
       message: "route on session",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       deliver: true,
       channel: "telegram",
       to: "123",

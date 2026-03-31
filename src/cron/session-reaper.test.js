@@ -33,17 +33,17 @@ describe("resolveRetentionMs", () => {
 });
 describe("isCronRunSessionKey", () => {
   it("matches cron run session keys", () => {
-    expect(isCronRunSessionKey("agent:main:cron:abc-123:run:def-456")).toBe(true);
+    expect(isCronRunSessionKey("agent:default:cron:abc-123:run:def-456")).toBe(true);
     expect(isCronRunSessionKey("agent:debugger:cron:249ecf82:run:1102aabb")).toBe(true);
   });
   it("does not match base cron session keys", () => {
-    expect(isCronRunSessionKey("agent:main:cron:abc-123")).toBe(false);
+    expect(isCronRunSessionKey("agent:default:cron:abc-123")).toBe(false);
   });
   it("does not match regular session keys", () => {
-    expect(isCronRunSessionKey("agent:main:telegram:dm:123")).toBe(false);
+    expect(isCronRunSessionKey("agent:default:telegram:dm:123")).toBe(false);
   });
   it("does not match non-canonical cron-like keys", () => {
-    expect(isCronRunSessionKey("agent:main:slack:cron:job:run:uuid")).toBe(false);
+    expect(isCronRunSessionKey("agent:default:slack:cron:job:run:uuid")).toBe(false);
     expect(isCronRunSessionKey("cron:job:run:uuid")).toBe(false);
   });
 });
@@ -59,19 +59,19 @@ describe("sweepCronRunSessions", () => {
   it("prunes expired cron run sessions", async () => {
     const now = Date.now();
     const store = {
-      "agent:main:cron:job1": {
+      "agent:default:cron:job1": {
         sessionId: "base-session",
         updatedAt: now,
       },
-      "agent:main:cron:job1:run:old-run": {
+      "agent:default:cron:job1:run:old-run": {
         sessionId: "old-run",
         updatedAt: now - 90000000,
       },
-      "agent:main:cron:job1:run:recent-run": {
+      "agent:default:cron:job1:run:recent-run": {
         sessionId: "recent-run",
         updatedAt: now - 3600000,
       },
-      "agent:main:telegram:dm:123": {
+      "agent:default:telegram:dm:123": {
         sessionId: "regular-session",
         updatedAt: now - 360000000,
       },
@@ -86,15 +86,15 @@ describe("sweepCronRunSessions", () => {
     expect(result.swept).toBe(true);
     expect(result.pruned).toBe(1);
     const updated = JSON.parse(fs.readFileSync(storePath, "utf-8"));
-    expect(updated["agent:main:cron:job1"]).toBeDefined();
-    expect(updated["agent:main:cron:job1:run:old-run"]).toBeUndefined();
-    expect(updated["agent:main:cron:job1:run:recent-run"]).toBeDefined();
-    expect(updated["agent:main:telegram:dm:123"]).toBeDefined();
+    expect(updated["agent:default:cron:job1"]).toBeDefined();
+    expect(updated["agent:default:cron:job1:run:old-run"]).toBeUndefined();
+    expect(updated["agent:default:cron:job1:run:recent-run"]).toBeDefined();
+    expect(updated["agent:default:telegram:dm:123"]).toBeDefined();
   });
   it("respects custom retention", async () => {
     const now = Date.now();
     const store = {
-      "agent:main:cron:job1:run:run1": {
+      "agent:default:cron:job1:run:run1": {
         sessionId: "run1",
         updatedAt: now - 7200000,
       },
@@ -112,7 +112,7 @@ describe("sweepCronRunSessions", () => {
   it("does nothing when pruning is disabled", async () => {
     const now = Date.now();
     const store = {
-      "agent:main:cron:job1:run:run1": {
+      "agent:default:cron:job1:run:run1": {
         sessionId: "run1",
         updatedAt: now - 360000000,
       },

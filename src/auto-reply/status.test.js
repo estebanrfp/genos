@@ -57,7 +57,7 @@ describe("buildStatusMessage", () => {
         verboseLevel: "on",
         compactionCount: 2,
       },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionScope: "per-sender",
       resolvedThink: "medium",
       resolvedVerbose: "off",
@@ -73,7 +73,7 @@ describe("buildStatusMessage", () => {
     expect(normalized).toContain("Cost: $0.0020");
     expect(normalized).toContain("Context: 16k/32k (50%)");
     expect(normalized).toContain("Compactions: 2");
-    expect(normalized).toContain("Session: agent:main:main");
+    expect(normalized).toContain("Session: agent:default:main");
     expect(normalized).toContain("updated 10m ago");
     expect(normalized).toContain("Runtime: direct");
     expect(normalized).toContain("Think: medium");
@@ -85,7 +85,7 @@ describe("buildStatusMessage", () => {
     const text = buildStatusMessage({
       agent: { model: "anthropic/claude-opus-4-5" },
       sessionEntry: { sessionId: "v1", updatedAt: 0 },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionScope: "per-sender",
       resolvedThink: "low",
       resolvedVerbose: "on",
@@ -99,7 +99,7 @@ describe("buildStatusMessage", () => {
     const text = buildStatusMessage({
       agent: { model: "anthropic/claude-opus-4-5" },
       sessionEntry: { sessionId: "media", updatedAt: 0 },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       queue: { mode: "none" },
       mediaDecisions: [
         createSuccessfulImageMediaDecision(),
@@ -128,7 +128,7 @@ describe("buildStatusMessage", () => {
     const text = buildStatusMessage({
       agent: { model: "anthropic/claude-opus-4-5" },
       sessionEntry: { sessionId: "media-none", updatedAt: 0 },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       queue: { mode: "none" },
       mediaDecisions: [
         { capability: "image", outcome: "no-attachment", attachments: [] },
@@ -142,7 +142,7 @@ describe("buildStatusMessage", () => {
     const text = buildStatusMessage({
       agent: { model: "anthropic/claude-opus-4-5", elevatedDefault: "on" },
       sessionEntry: { sessionId: "v1", updatedAt: 0, elevatedLevel: "off" },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionScope: "per-sender",
       resolvedThink: "low",
       resolvedVerbose: "off",
@@ -167,7 +167,7 @@ describe("buildStatusMessage", () => {
         model: "claude-haiku-4-5",
         contextTokens: 32000,
       },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionScope: "per-sender",
       queue: { mode: "collect", depth: 0 },
       modelAuth: "api-key",
@@ -206,7 +206,7 @@ describe("buildStatusMessage", () => {
         groupActivation: "always",
         chatType: "group",
       },
-      sessionKey: "agent:main:whatsapp:group:123@g.us",
+      sessionKey: "agent:default:whatsapp:group:123@g.us",
       sessionScope: "per-sender",
       queue: { mode: "collect", depth: 0 },
       modelAuth: "api-key",
@@ -217,7 +217,7 @@ describe("buildStatusMessage", () => {
     const text = buildStatusMessage({
       agent: {},
       sessionEntry: { sessionId: "q1", updatedAt: 0 },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionScope: "per-sender",
       queue: {
         mode: "collect",
@@ -235,7 +235,7 @@ describe("buildStatusMessage", () => {
     const text = buildStatusMessage({
       agent: { model: "anthropic/claude-opus-4-5", contextTokens: 32000 },
       sessionEntry: { sessionId: "u1", updatedAt: 0, totalTokens: 1000 },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionScope: "per-sender",
       queue: { mode: "collect", depth: 0 },
       usageLine: "\uD83D\uDCCA Usage: Claude 80% left (5h)",
@@ -269,7 +269,7 @@ describe("buildStatusMessage", () => {
       },
       agent: { model: "anthropic/claude-opus-4-5" },
       sessionEntry: { sessionId: "c1", updatedAt: 0, inputTokens: 10 },
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionScope: "per-sender",
       queue: { mode: "collect", depth: 0 },
       modelAuth: "oauth",
@@ -344,7 +344,7 @@ describe("buildStatusMessage", () => {
         });
         const text = buildTranscriptStatusText({
           sessionId,
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
         });
         expect(normalizeTestText(text)).toContain("Context: 1.0k/32k");
       },

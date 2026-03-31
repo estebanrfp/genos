@@ -192,8 +192,8 @@ describe("applyReplyThreading auto-threading", () => {
 });
 const baseRun = {
   runId: "run-1",
-  childSessionKey: "agent:main:subagent:abc",
-  requesterSessionKey: "agent:main:main",
+  childSessionKey: "agent:default:subagent:abc",
+  requesterSessionKey: "agent:default:main",
   requesterDisplayKey: "main",
   task: "do thing",
   cleanup: "keep",

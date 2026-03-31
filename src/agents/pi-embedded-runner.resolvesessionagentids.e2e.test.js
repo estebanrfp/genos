@@ -36,7 +36,7 @@ describe("resolveSessionAgentIds", () => {
   });
   it("uses the agent id from agent session keys", () => {
     const { sessionAgentId } = resolveSessionAgentIds({
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       config: cfg,
     });
     expect(sessionAgentId).toBe("main");

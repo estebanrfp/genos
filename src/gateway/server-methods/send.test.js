@@ -121,12 +121,12 @@ describe("gateway send mirroring", () => {
       message: "hi",
       channel: "slack",
       idempotencyKey: "idem-1",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
         }),
       }),
     );
@@ -139,12 +139,12 @@ describe("gateway send mirroring", () => {
       mediaUrl: "https://example.com/files/report.pdf?sig=1",
       channel: "slack",
       idempotencyKey: "idem-2",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
           text: "caption",
           mediaUrls: ["https://example.com/files/report.pdf?sig=1"],
         }),
@@ -158,12 +158,12 @@ describe("gateway send mirroring", () => {
       message: "Here\nMEDIA:https://example.com/image.png",
       channel: "slack",
       idempotencyKey: "idem-3",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
     });
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
           text: "Here",
           mediaUrls: ["https://example.com/image.png"],
         }),
@@ -177,12 +177,12 @@ describe("gateway send mirroring", () => {
       message: "hi",
       channel: "slack",
       idempotencyKey: "idem-lower",
-      sessionKey: "agent:main:slack:channel:C123",
+      sessionKey: "agent:default:slack:channel:C123",
     });
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({
-          sessionKey: "agent:main:slack:channel:c123",
+          sessionKey: "agent:default:slack:channel:c123",
         }),
       }),
     );
@@ -199,7 +199,7 @@ describe("gateway send mirroring", () => {
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({
-          sessionKey: "agent:main:slack:channel:resolved",
+          sessionKey: "agent:default:slack:channel:resolved",
           agentId: "main",
         }),
       }),

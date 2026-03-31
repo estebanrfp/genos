@@ -43,15 +43,15 @@ describe("agent runner helpers", () => {
   });
   it("uses session verbose level when present", () => {
     hoisted.loadSessionStoreMock.mockReturnValue({
-      "agent:main:main": { verboseLevel: "full" },
+      "agent:default:main": { verboseLevel: "full" },
     });
     const shouldEmitResult = createShouldEmitToolResult({
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       storePath: "/tmp/store.json",
       resolvedVerboseLevel: "off",
     });
     const shouldEmitOutput = createShouldEmitToolOutput({
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       storePath: "/tmp/store.json",
       resolvedVerboseLevel: "off",
     });
@@ -63,17 +63,17 @@ describe("agent runner helpers", () => {
       throw new Error("boom");
     });
     const fallbackOn = createShouldEmitToolResult({
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       storePath: "/tmp/store.json",
       resolvedVerboseLevel: "on",
     });
     expect(fallbackOn()).toBe(true);
     hoisted.loadSessionStoreMock.mockReset();
     hoisted.loadSessionStoreMock.mockReturnValue({
-      "agent:main:main": { verboseLevel: "weird" },
+      "agent:default:main": { verboseLevel: "weird" },
     });
     const fallbackFull = createShouldEmitToolOutput({
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       storePath: "/tmp/store.json",
       resolvedVerboseLevel: "full",
     });

@@ -21,7 +21,7 @@ describe("getDmHistoryLimitFromSessionKey", () => {
         },
       },
     };
-    expect(getDmHistoryLimitFromSessionKey("agent:main:telegram:dm:789", config)).toBe(3);
+    expect(getDmHistoryLimitFromSessionKey("agent:default:telegram:dm:789", config)).toBe(3);
   });
   it("handles userId with colons (e.g., email)", () => {
     const config = {

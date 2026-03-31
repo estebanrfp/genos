@@ -97,7 +97,7 @@ describe("directive behavior", () => {
       const text = replyText(res);
       assertElevatedOffStatusReply(text);
       const store = loadSessionStore(storePath);
-      expect(store["agent:main:main"]?.elevatedLevel).toBe("off");
+      expect(store["agent:default:main"]?.elevatedLevel).toBe("off");
       expect(runEmbeddedPiAgent).not.toHaveBeenCalled();
     });
   });
@@ -123,7 +123,7 @@ describe("directive behavior", () => {
         makeElevatedDirectiveConfig(home),
       );
       const store = loadSessionStore(storePath);
-      expect(store["agent:main:main"]?.elevatedLevel).toBeUndefined();
+      expect(store["agent:default:main"]?.elevatedLevel).toBeUndefined();
       const calls = vi.mocked(runEmbeddedPiAgent).mock.calls;
       expect(calls.length).toBeGreaterThan(0);
       const call = calls[0]?.[0];

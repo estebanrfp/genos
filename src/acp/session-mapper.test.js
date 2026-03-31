@@ -1,4 +1,4 @@
-let createGateway = function (resolveLabelKey = "agent:main:label") {
+let createGateway = function (resolveLabelKey = "agent:default:label") {
   const request = vi.fn(async (method, params) => {
     if (method === "sessions.resolve" && "label" in params) {
       return { ok: true, key: resolveLabelKey };
@@ -19,27 +19,27 @@ import { createInMemorySessionStore } from "./session.js";
 describe("acp session mapper", () => {
   it("prefers explicit sessionLabel over sessionKey", async () => {
     const { gateway, request } = createGateway();
-    const meta = parseSessionMeta({ sessionLabel: "support", sessionKey: "agent:main:main" });
+    const meta = parseSessionMeta({ sessionLabel: "support", sessionKey: "agent:default:main" });
     const key = await resolveSessionKey({
       meta,
       fallbackKey: "acp:fallback",
       gateway,
       opts: {},
     });
-    expect(key).toBe("agent:main:label");
+    expect(key).toBe("agent:default:label");
     expect(request).toHaveBeenCalledTimes(1);
     expect(request).toHaveBeenCalledWith("sessions.resolve", { label: "support" });
   });
   it("lets meta sessionKey override default label", async () => {
     const { gateway, request } = createGateway();
-    const meta = parseSessionMeta({ sessionKey: "agent:main:override" });
+    const meta = parseSessionMeta({ sessionKey: "agent:default:override" });
     const key = await resolveSessionKey({
       meta,
       fallbackKey: "acp:fallback",
       gateway,
       opts: { defaultSessionLabel: "default-label" },
     });
-    expect(key).toBe("agent:main:override");
+    expect(key).toBe("agent:default:override");
     expect(request).not.toHaveBeenCalled();
   });
 });

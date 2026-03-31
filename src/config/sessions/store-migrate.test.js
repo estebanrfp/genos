@@ -53,7 +53,7 @@ describe("migrateSessionStore", () => {
 
   it("preserves keys from other agents", async () => {
     mocks.loadSessionStore.mockReturnValue({
-      "agent:main:main": { label: "Main Agent", updatedAt: 1 },
+      "agent:default:main": { label: "Main Agent", updatedAt: 1 },
       "agent:other-bot:main": { label: "Other Bot", updatedAt: 2 },
     });
 
@@ -62,7 +62,7 @@ describe("migrateSessionStore", () => {
     expect(result.migratedKeys).toBe(0);
     expect(result.migratedSpawnedBy).toBe(0);
     const saved = mocks.saveSessionStore.mock.calls[0][1];
-    expect(saved).toHaveProperty("agent:main:main");
+    expect(saved).toHaveProperty("agent:default:main");
     expect(saved).toHaveProperty("agent:other-bot:main");
   });
 

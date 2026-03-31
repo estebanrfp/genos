@@ -337,13 +337,13 @@ describe("routeReply", () => {
       payload: { text: "hi" },
       channel: "slack",
       to: "channel:C123",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       cfg: {},
     });
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({
-          sessionKey: "agent:main:main",
+          sessionKey: "agent:default:main",
           text: "hi",
         }),
       }),
@@ -355,7 +355,7 @@ describe("routeReply", () => {
       payload: { text: "hi" },
       channel: "slack",
       to: "channel:C123",
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       mirror: false,
       cfg: {},
     });

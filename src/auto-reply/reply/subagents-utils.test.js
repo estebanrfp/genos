@@ -2,8 +2,8 @@ let makeRun = function (overrides) {
     const id = overrides.runId ?? "run-default";
     return {
       runId: id,
-      childSessionKey: overrides.childSessionKey ?? `agent:main:subagent:${id}`,
-      requesterSessionKey: overrides.requesterSessionKey ?? "agent:main:main",
+      childSessionKey: overrides.childSessionKey ?? `agent:default:subagent:${id}`,
+      requesterSessionKey: overrides.requesterSessionKey ?? "agent:default:main",
       requesterDisplayKey: overrides.requesterDisplayKey ?? "main",
       task: overrides.task ?? "default task",
       cleanup: overrides.cleanup ?? "keep",

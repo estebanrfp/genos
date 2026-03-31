@@ -113,7 +113,7 @@ describe("imessage monitor gating + envelope builders", () => {
     };
     const ctxPayload = buildDispatchContextPayload({ cfg, message });
     expect(ctxPayload.ChatType).toBe("group");
-    expect(ctxPayload.SessionKey).toBe("agent:main:imessage:group:42");
+    expect(ctxPayload.SessionKey).toBe("agent:default:imessage:group:42");
     expect(String(ctxPayload.Body ?? "")).toContain("+15550002222:");
     expect(String(ctxPayload.Body ?? "")).not.toContain("[from:");
     expect(ctxPayload.To).toBe("chat_id:42");
@@ -154,7 +154,7 @@ describe("imessage monitor gating + envelope builders", () => {
     };
     const { decision } = resolveDispatchDecision({ cfg, message, groupHistories });
     expect(decision.isGroup).toBe(true);
-    expect(decision.route.sessionKey).toBe("agent:main:imessage:group:2");
+    expect(decision.route.sessionKey).toBe("agent:default:imessage:group:2");
   });
   it("allows group messages when requireMention is true but no mentionPatterns exist", () => {
     const cfg = baseCfg();

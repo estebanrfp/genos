@@ -13,14 +13,14 @@ describe("parseSlackModalPrivateMetadata", () => {
     expect(
       parseSlackModalPrivateMetadata(
         JSON.stringify({
-          sessionKey: "agent:main:slack:channel:C1",
+          sessionKey: "agent:default:slack:channel:C1",
           channelId: "D123",
           channelType: "im",
           ignored: "x",
         }),
       ),
     ).toEqual({
-      sessionKey: "agent:main:slack:channel:C1",
+      sessionKey: "agent:default:slack:channel:C1",
       channelId: "D123",
       channelType: "im",
     });
@@ -31,20 +31,20 @@ describe("encodeSlackModalPrivateMetadata", () => {
     expect(
       JSON.parse(
         encodeSlackModalPrivateMetadata({
-          sessionKey: "agent:main:slack:channel:C1",
+          sessionKey: "agent:default:slack:channel:C1",
           channelId: "",
           channelType: "im",
         }),
       ),
     ).toEqual({
-      sessionKey: "agent:main:slack:channel:C1",
+      sessionKey: "agent:default:slack:channel:C1",
       channelType: "im",
     });
   });
   it("throws when encoded payload exceeds Slack metadata limit", () => {
     expect(() =>
       encodeSlackModalPrivateMetadata({
-        sessionKey: `agent:main:${"x".repeat(4000)}`,
+        sessionKey: `agent:default:${"x".repeat(4000)}`,
       }),
     ).toThrow(/cannot exceed 3000 chars/i);
   });
