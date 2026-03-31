@@ -39,24 +39,24 @@ describe("resolveSessionKeyForRequest", () => {
   it("returns sessionKey when --to resolves a session key via context", async () => {
     mocks.resolveStorePath.mockReturnValue(MAIN_STORE_PATH);
     mocks.loadSessionStore.mockReturnValue({
-      "agent:main:main": { sessionId: "sess-1", updatedAt: 0 },
+      "agent:default:main": { sessionId: "sess-1", updatedAt: 0 },
     });
     const result = resolveSessionKeyForRequest({
       cfg: baseCfg,
       to: "+15551234567",
     });
-    expect(result.sessionKey).toBe("agent:main:main");
+    expect(result.sessionKey).toBe("agent:default:main");
   });
   it("finds session by sessionId via reverse lookup in primary store", async () => {
     mocks.resolveStorePath.mockReturnValue(MAIN_STORE_PATH);
     mocks.loadSessionStore.mockReturnValue({
-      "agent:main:main": { sessionId: "target-session-id", updatedAt: 0 },
+      "agent:default:main": { sessionId: "target-session-id", updatedAt: 0 },
     });
     const result = resolveSessionKeyForRequest({
       cfg: baseCfg,
       sessionId: "target-session-id",
     });
-    expect(result.sessionKey).toBe("agent:main:main");
+    expect(result.sessionKey).toBe("agent:default:main");
   });
   it("finds session by sessionId in non-primary agent store", async () => {
     setupMainAndMybotStorePaths();
@@ -99,20 +99,20 @@ describe("resolveSessionKeyForRequest", () => {
     mocks.listAgentIds.mockReturnValue(["main", "mybot"]);
     mocks.resolveStorePath.mockReturnValue(MAIN_STORE_PATH);
     mocks.loadSessionStore.mockReturnValue({
-      "agent:main:main": { sessionId: "other-id", updatedAt: 0 },
+      "agent:default:main": { sessionId: "other-id", updatedAt: 0 },
     });
     const result = resolveSessionKeyForRequest({
       cfg: baseCfg,
-      sessionKey: "agent:main:main",
+      sessionKey: "agent:default:main",
       sessionId: "target-session-id",
     });
-    expect(result.sessionKey).toBe("agent:main:main");
+    expect(result.sessionKey).toBe("agent:default:main");
   });
   it("searches other stores when --to derives a key that does not match --session-id", async () => {
     setupMainAndMybotStorePaths();
     mockStoresByPath({
       [MAIN_STORE_PATH]: {
-        "agent:main:main": { sessionId: "other-session-id", updatedAt: 0 },
+        "agent:default:main": { sessionId: "other-session-id", updatedAt: 0 },
       },
       [MYBOT_STORE_PATH]: {
         "agent:mybot:main": { sessionId: "target-session-id", updatedAt: 0 },
@@ -134,7 +134,7 @@ describe("resolveSessionKeyForRequest", () => {
       sessionId: "nonexistent-id",
     });
     const storePaths = mocks.loadSessionStore.mock.calls.map((call) => String(call[0]));
-    expect(storePaths).toHaveLength(2);
+    expect(storePaths).toHaveLength(3);
     expect(storePaths).toContain(MAIN_STORE_PATH);
     expect(storePaths).toContain(MYBOT_STORE_PATH);
   });

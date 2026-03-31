@@ -54,7 +54,7 @@ describe("sessions", () => {
   it("keeps explicit provider when provided in group key", () => {
     expect(
       resolveSessionKey("per-sender", { From: "discord:group:12345", ChatType: "group" }, "main"),
-    ).toBe("agent:main:discord:group:12345");
+    ).toBe("agent:default:discord:group:12345");
   });
   it("builds discord display name with guild+channel slugs", () => {
     expect(
@@ -68,19 +68,19 @@ describe("sessions", () => {
     ).toBe("discord:friends-of-genosos#general");
   });
   it("collapses direct chats to main by default", () => {
-    expect(resolveSessionKey("per-sender", { From: "+1555" })).toBe("agent:main:main");
+    expect(resolveSessionKey("per-sender", { From: "+1555" })).toBe("agent:default:main");
   });
   it("collapses direct chats to main even when sender missing", () => {
-    expect(resolveSessionKey("per-sender", {})).toBe("agent:main:main");
+    expect(resolveSessionKey("per-sender", {})).toBe("agent:default:main");
   });
   it("maps direct chats to main key when provided", () => {
     expect(resolveSessionKey("per-sender", { From: "whatsapp:+1555" }, "main")).toBe(
-      "agent:main:main",
+      "agent:default:main",
     );
   });
   it("uses custom main key when provided", () => {
     expect(resolveSessionKey("per-sender", { From: "+1555" }, "primary")).toBe(
-      "agent:main:primary",
+      "agent:default:primary",
     );
   });
   it("keeps global scope untouched", () => {
@@ -88,11 +88,11 @@ describe("sessions", () => {
   });
   it("leaves groups untouched even with main key", () => {
     expect(resolveSessionKey("per-sender", { From: "12345-678@g.us" }, "main")).toBe(
-      "agent:main:whatsapp:group:12345-678@g.us",
+      "agent:default:whatsapp:group:12345-678@g.us",
     );
   });
   it("updateLastRoute persists channel and target", async () => {
-    const mainSessionKey = "agent:main:main";
+    const mainSessionKey = "agent:default:main";
     const dir = await createCaseDir("updateLastRoute");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(
@@ -142,7 +142,7 @@ describe("sessions", () => {
     expect(store[mainSessionKey]?.compactionCount).toBe(2);
   });
   it("updateLastRoute prefers explicit deliveryContext", async () => {
-    const mainSessionKey = "agent:main:main";
+    const mainSessionKey = "agent:default:main";
     const dir = await createCaseDir("updateLastRoute");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(storePath, "{}", "utf-8");
@@ -169,7 +169,7 @@ describe("sessions", () => {
     });
   });
   it("updateLastRoute clears threadId when explicit route omits threadId", async () => {
-    const mainSessionKey = "agent:main:main";
+    const mainSessionKey = "agent:default:main";
     const dir = await createCaseDir("updateLastRoute");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(
@@ -210,7 +210,7 @@ describe("sessions", () => {
     expect(store[mainSessionKey]?.lastThreadId).toBeUndefined();
   });
   it("updateLastRoute records origin + group metadata when ctx is provided", async () => {
-    const sessionKey = "agent:main:whatsapp:group:123@g.us";
+    const sessionKey = "agent:default:whatsapp:group:123@g.us";
     const dir = await createCaseDir("updateLastRoute");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(storePath, "{}", "utf-8");
@@ -237,7 +237,7 @@ describe("sessions", () => {
     expect(store[sessionKey]?.origin?.chatType).toBe("group");
   });
   it("updateSessionStoreEntry preserves existing fields when patching", async () => {
-    const sessionKey = "agent:main:main";
+    const sessionKey = "agent:default:main";
     const dir = await createCaseDir("updateSessionStoreEntry");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(
@@ -270,25 +270,25 @@ describe("sessions", () => {
     await fs.writeFile(storePath, "{}", "utf-8");
     await Promise.all([
       updateSessionStore(storePath, (store) => {
-        store["agent:main:one"] = { sessionId: "sess-1", updatedAt: Date.now() };
+        store["agent:default:one"] = { sessionId: "sess-1", updatedAt: Date.now() };
       }),
       updateSessionStore(storePath, (store) => {
-        store["agent:main:two"] = { sessionId: "sess-2", updatedAt: Date.now() };
+        store["agent:default:two"] = { sessionId: "sess-2", updatedAt: Date.now() };
       }),
     ]);
     const store = loadSessionStore(storePath);
-    expect(store["agent:main:one"]?.sessionId).toBe("sess-1");
-    expect(store["agent:main:two"]?.sessionId).toBe("sess-2");
+    expect(store["agent:default:one"]?.sessionId).toBe("sess-1");
+    expect(store["agent:default:two"]?.sessionId).toBe("sess-2");
   });
   it("recovers from array-backed session stores", async () => {
     const dir = await createCaseDir("updateSessionStore");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(storePath, "[]", "utf-8");
     await updateSessionStore(storePath, (store) => {
-      store["agent:main:main"] = { sessionId: "sess-1", updatedAt: Date.now() };
+      store["agent:default:main"] = { sessionId: "sess-1", updatedAt: Date.now() };
     });
     const store = loadSessionStore(storePath);
-    expect(store["agent:main:main"]?.sessionId).toBe("sess-1");
+    expect(store["agent:default:main"]?.sessionId).toBe("sess-1");
     const raw = await fs.readFile(storePath, "utf-8");
     expect(raw.trim().startsWith("{")).toBe(true);
   });
@@ -297,7 +297,7 @@ describe("sessions", () => {
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(storePath, "{}", "utf-8");
     await updateSessionStore(storePath, (store) => {
-      store["agent:main:main"] = {
+      store["agent:default:main"] = {
         sessionId: "sess-normalized",
         updatedAt: Date.now(),
         lastChannel: " WhatsApp ",
@@ -306,10 +306,10 @@ describe("sessions", () => {
       };
     });
     const store = loadSessionStore(storePath);
-    expect(store["agent:main:main"]?.lastChannel).toBe("whatsapp");
-    expect(store["agent:main:main"]?.lastTo).toBe("+1555");
-    expect(store["agent:main:main"]?.lastAccountId).toBe("acct-1");
-    expect(store["agent:main:main"]?.deliveryContext).toEqual({
+    expect(store["agent:default:main"]?.lastChannel).toBe("whatsapp");
+    expect(store["agent:default:main"]?.lastTo).toBe("+1555");
+    expect(store["agent:default:main"]?.lastAccountId).toBe("acct-1");
+    expect(store["agent:default:main"]?.deliveryContext).toEqual({
       channel: "whatsapp",
       to: "+1555",
       accountId: "acct-1",
@@ -322,8 +322,8 @@ describe("sessions", () => {
       storePath,
       JSON.stringify(
         {
-          "agent:main:old": { sessionId: "sess-old", updatedAt: Date.now() },
-          "agent:main:keep": { sessionId: "sess-keep", updatedAt: Date.now() },
+          "agent:default:old": { sessionId: "sess-old", updatedAt: Date.now() },
+          "agent:default:keep": { sessionId: "sess-keep", updatedAt: Date.now() },
         },
         null,
         2,
@@ -332,19 +332,19 @@ describe("sessions", () => {
     );
     await Promise.all([
       updateSessionStore(storePath, (store) => {
-        delete store["agent:main:old"];
+        delete store["agent:default:old"];
       }),
       updateSessionStore(storePath, (store) => {
-        store["agent:main:new"] = { sessionId: "sess-new", updatedAt: Date.now() };
+        store["agent:default:new"] = { sessionId: "sess-new", updatedAt: Date.now() };
       }),
     ]);
     const store = loadSessionStore(storePath);
-    expect(store["agent:main:old"]).toBeUndefined();
-    expect(store["agent:main:keep"]?.sessionId).toBe("sess-keep");
-    expect(store["agent:main:new"]?.sessionId).toBe("sess-new");
+    expect(store["agent:default:old"]).toBeUndefined();
+    expect(store["agent:default:keep"]?.sessionId).toBe("sess-keep");
+    expect(store["agent:default:new"]?.sessionId).toBe("sess-new");
   });
   it("loadSessionStore auto-migrates legacy provider keys to channel keys", async () => {
-    const mainSessionKey = "agent:main:main";
+    const mainSessionKey = "agent:default:main";
     const dir = await createCaseDir("loadSessionStore");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(
@@ -376,18 +376,18 @@ describe("sessions", () => {
       { GENOS_STATE_DIR: "/custom/state" },
       () => "/home/ignored",
     );
-    expect(dir).toBe(path.join(path.resolve("/custom/state"), "agents", "main", "sessions"));
+    expect(dir).toBe(path.join(path.resolve("/custom/state"), "agents", "default", "sessions"));
   });
   it("includes topic ids in session transcript filenames", () => {
     const prev = process.env.GENOS_STATE_DIR;
     process.env.GENOS_STATE_DIR = "/custom/state";
     try {
-      const sessionFile = resolveSessionTranscriptPath("sess-1", "main", 123);
+      const sessionFile = resolveSessionTranscriptPath("sess-1", "default", 123);
       expect(sessionFile).toBe(
         path.join(
           path.resolve("/custom/state"),
           "agents",
-          "main",
+          "default",
           "sessions",
           "sess-1-topic-123.jsonl",
         ),
@@ -478,7 +478,7 @@ describe("sessions", () => {
     }
   });
   it("updateSessionStoreEntry merges concurrent patches", async () => {
-    const mainSessionKey = "agent:main:main";
+    const mainSessionKey = "agent:default:main";
     const dir = await createCaseDir("updateSessionStoreEntry");
     const storePath = path.join(dir, "sessions.json");
     await fs.writeFile(

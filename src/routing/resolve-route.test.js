@@ -9,9 +9,9 @@ describe("resolveAgentRoute", () => {
       accountId: null,
       peer: { kind: "direct", id: "+15551234567" },
     });
-    expect(route.agentId).toBe("main");
+    expect(route.agentId).toBe("default");
     expect(route.accountId).toBe("default");
-    expect(route.sessionKey).toBe("agent:main:whatsapp:direct:+15551234567");
+    expect(route.sessionKey).toBe("agent:default:whatsapp:direct:+15551234567");
     expect(route.matchedBy).toBe("default");
   });
   test("dmScope=per-peer isolates DM sessions by sender id", () => {
@@ -24,7 +24,7 @@ describe("resolveAgentRoute", () => {
       accountId: null,
       peer: { kind: "direct", id: "+15551234567" },
     });
-    expect(route.sessionKey).toBe("agent:main:direct:+15551234567");
+    expect(route.sessionKey).toBe("agent:default:direct:+15551234567");
   });
   test("dmScope=per-channel-peer isolates DM sessions per channel and sender", () => {
     const cfg = {
@@ -36,7 +36,7 @@ describe("resolveAgentRoute", () => {
       accountId: null,
       peer: { kind: "direct", id: "+15551234567" },
     });
-    expect(route.sessionKey).toBe("agent:main:whatsapp:direct:+15551234567");
+    expect(route.sessionKey).toBe("agent:default:whatsapp:direct:+15551234567");
   });
   test("identityLinks collapses per-peer DM sessions across providers", () => {
     const cfg = {
@@ -53,7 +53,7 @@ describe("resolveAgentRoute", () => {
       accountId: null,
       peer: { kind: "direct", id: "111111111" },
     });
-    expect(route.sessionKey).toBe("agent:main:direct:alice");
+    expect(route.sessionKey).toBe("agent:default:direct:alice");
   });
   test("identityLinks applies to per-channel-peer DM sessions", () => {
     const cfg = {
@@ -70,7 +70,7 @@ describe("resolveAgentRoute", () => {
       accountId: null,
       peer: { kind: "direct", id: "222222222222222222" },
     });
-    expect(route.sessionKey).toBe("agent:main:discord:direct:alice");
+    expect(route.sessionKey).toBe("agent:default:discord:direct:alice");
   });
   test("peer binding wins over account binding", () => {
     const cfg = {
@@ -139,7 +139,7 @@ describe("resolveAgentRoute", () => {
       accountId: "default",
       peer: { kind: "channel", id: 1468834856187203680n },
     });
-    expect(route.sessionKey).toBe("agent:main:discord:channel:1468834856187203680");
+    expect(route.sessionKey).toBe("agent:default:discord:channel:1468834856187203680");
   });
   test("guild binding wins over account binding when peer not bound", () => {
     const cfg = {
@@ -302,7 +302,7 @@ describe("resolveAgentRoute", () => {
       accountId: "biz",
       peer: { kind: "direct", id: "+1000" },
     });
-    expect(otherRoute.agentId).toBe("main");
+    expect(otherRoute.agentId).toBe("default");
   });
   test("accountId=* matches any account as a channel fallback", () => {
     const cfg = {
@@ -348,7 +348,7 @@ test("dmScope=per-account-channel-peer isolates DM sessions per account, channel
     accountId: "tasks",
     peer: { kind: "direct", id: "7550356539" },
   });
-  expect(route.sessionKey).toBe("agent:main:telegram:tasks:direct:7550356539");
+  expect(route.sessionKey).toBe("agent:default:telegram:tasks:direct:7550356539");
 });
 test("dmScope=per-account-channel-peer uses default accountId when not provided", () => {
   const cfg = {
@@ -360,7 +360,7 @@ test("dmScope=per-account-channel-peer uses default accountId when not provided"
     accountId: null,
     peer: { kind: "direct", id: "7550356539" },
   });
-  expect(route.sessionKey).toBe("agent:main:telegram:default:direct:7550356539");
+  expect(route.sessionKey).toBe("agent:default:telegram:default:direct:7550356539");
 });
 describe("parentPeer binding inheritance (thread support)", () => {
   const threadPeer = { kind: "channel", id: "thread-456" };
@@ -439,7 +439,7 @@ describe("parentPeer binding inheritance (thread support)", () => {
       bindings: [makeDiscordPeerBinding("parent-agent", defaultParentPeer.id)],
     };
     const route = resolveDiscordThreadRoute({ cfg, parentPeer: { kind: "channel", id: "" } });
-    expect(route.agentId).toBe("main");
+    expect(route.agentId).toBe("default");
     expect(route.matchedBy).toBe("default");
   });
   test("null parentPeer is handled gracefully", () => {
@@ -447,7 +447,7 @@ describe("parentPeer binding inheritance (thread support)", () => {
       bindings: [makeDiscordPeerBinding("parent-agent", defaultParentPeer.id)],
     };
     const route = resolveDiscordThreadRoute({ cfg, parentPeer: null });
-    expect(route.agentId).toBe("main");
+    expect(route.agentId).toBe("default");
     expect(route.matchedBy).toBe("default");
   });
 });
@@ -514,7 +514,7 @@ describe("role-based agent routing", () => {
     expectDiscordRoleRoute({
       bindings: [makeDiscordRoleBinding("opus", { roles: ["r1"] })],
       memberRoleIds: ["r2"],
-      expectedAgentId: "main",
+      expectedAgentId: "default",
       expectedMatchedBy: "default",
     });
   });
@@ -559,7 +559,7 @@ describe("role-based agent routing", () => {
   test("no memberRoleIds means guild+roles doesn't match", () => {
     expectDiscordRoleRoute({
       bindings: [makeDiscordRoleBinding("opus", { roles: ["r1"] })],
-      expectedAgentId: "main",
+      expectedAgentId: "default",
       expectedMatchedBy: "default",
     });
   });
@@ -586,7 +586,7 @@ describe("role-based agent routing", () => {
     expectDiscordRoleRoute({
       bindings: [makeDiscordRoleBinding("opus", { roles: ["admin"] })],
       memberRoleIds: ["regular"],
-      expectedAgentId: "main",
+      expectedAgentId: "default",
       expectedMatchedBy: "default",
     });
   });

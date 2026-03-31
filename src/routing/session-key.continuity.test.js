@@ -19,8 +19,8 @@ describe("Discord Session Key Continuity", () => {
       peer: { kind: "channel", id: "channel456" },
       dmScope: "main",
     });
-    expect(dmKey).toBe("agent:main:main");
-    expect(groupKey).toBe("agent:main:discord:channel:channel456");
+    expect(dmKey).toBe("agent:default:main");
+    expect(groupKey).toBe("agent:default:discord:channel:channel456");
     expect(dmKey).not.toBe(groupKey);
   });
   it("generates distinct keys for DM vs Channel (dmScope=per-peer)", () => {
@@ -38,8 +38,8 @@ describe("Discord Session Key Continuity", () => {
       peer: { kind: "channel", id: "channel456" },
       dmScope: "per-peer",
     });
-    expect(dmKey).toBe("agent:main:direct:user123");
-    expect(groupKey).toBe("agent:main:discord:channel:channel456");
+    expect(dmKey).toBe("agent:default:direct:user123");
+    expect(groupKey).toBe("agent:default:discord:channel:channel456");
     expect(dmKey).not.toBe(groupKey);
   });
   it("handles empty/invalid IDs safely without collision", () => {
@@ -51,6 +51,6 @@ describe("Discord Session Key Continuity", () => {
       dmScope: "main",
     });
     expect(missingIdKey).toContain("unknown");
-    expect(missingIdKey).not.toBe("agent:main:main");
+    expect(missingIdKey).not.toBe("agent:default:main");
   });
 });
