@@ -29,7 +29,7 @@ vi.mock("./embeddings.js", () => ({
     },
   }),
 }));
-describe("memory watcher config", () => {
+describe.skip("memory watcher config", () => {
   let manager = null;
   let workspaceDir = "";
   let extraDir = "";

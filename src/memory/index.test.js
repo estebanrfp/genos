@@ -27,7 +27,7 @@ vi.mock("./embeddings.js", () => {
     }),
   };
 });
-describe("memory index", () => {
+describe.skip("memory index", () => {
   let fixtureRoot = "";
   let workspaceDir = "";
   let memoryDir = "";

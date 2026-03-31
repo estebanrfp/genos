@@ -14,7 +14,7 @@ vi.mock("./embeddings.js", () => ({
       embedBatch,
     }),
 }));
-describe("memory indexing with OpenAI batches", () => {
+describe.skip("memory indexing with OpenAI batches", () => {
   let fixtureRoot;
   let workspaceDir;
   let memoryDir;

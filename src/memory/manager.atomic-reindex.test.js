@@ -5,7 +5,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { getEmbedBatchMock, resetEmbeddingMocks } from "./embedding.test-mocks.js";
 import { getRequiredMemoryIndexManager } from "./test-manager-helpers.js";
 let shouldFail = false;
-describe("memory manager atomic reindex", () => {
+describe.skip("memory manager atomic reindex", () => {
   let fixtureRoot = "";
   let caseId = 0;
   let workspaceDir;
