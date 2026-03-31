@@ -267,7 +267,7 @@ describe("mention helpers", () => {
     expect(regexes[0]?.test("genosos")).toBe(true);
   });
   it("normalizes zero-width characters", () => {
-    expect(normalizeMentionText("nyx\u200Bclaw")).toBe("genosos");
+    expect(normalizeMentionText("nyx\u200Bclaw")).toBe("nyxclaw");
   });
   it("matches patterns case-insensitively", () => {
     const regexes = buildMentionRegexes({
