@@ -3,7 +3,7 @@ Summary: macOS only. Requires imsg CLI + Full Disk Access for Bun. The #1 cause 
 
 Prerequisites:
 · macOS with Messages app signed into Apple ID
-· imsg CLI: brew install steipete/tap/imsg
+· imsg CLI installed (see https://github.com/nickthedude/imsg)
 · Full Disk Access granted to Bun (or Terminal) in System Settings → Privacy & Security → Full Disk Access
 · Automation permission for Messages.app (triggered on first imsg send)
 
